@@ -11,15 +11,15 @@ export default function CTA() {
   return (
     <section className="py-48 bg-gray-900">
       <div className="container-custom">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+        <div className="text-center" style={{ maxWidth: '64rem', margin: '0 auto' }}>
+          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6" style={{ textAlign: 'center' }}>
             Ready to Transform Your Construction Business?
           </h2>
-          <p className="text-xl text-gray-300 mb-10">
+          <p className="text-xl text-gray-300 mb-10" style={{ textAlign: 'center', margin: '0 auto 2.5rem auto' }}>
             See if BUILDER BASE is the right fit for your business. Start your free 14-day trial today.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 mb-8" style={{ justifyContent: 'center', alignItems: 'center' }}>
             <button onClick={() => setModalOpen(true)} className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
               Start Your Free Trial
             </button>
@@ -28,7 +28,7 @@ export default function CTA() {
             </button>
           </div>
 
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-400" style={{ textAlign: 'center', marginBottom: '3rem' }}>
             No credit card required. Cancel anytime.
           </p>
         </div>

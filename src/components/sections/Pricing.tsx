@@ -66,11 +66,11 @@ export default function Pricing() {
   ]
 
   return (
-    <section id="pricing" className="bg-gray-50" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+    <section id="pricing" className="bg-gray-50" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
       <div className="container-custom">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold text-gray-900" style={{ marginBottom: '32px' }}>Simple, Transparent Pricing</h2>
-          <p className="text-xl text-gray-600 leading-relaxed" style={{ maxWidth: '48rem', margin: '0 auto', textAlign: 'center', paddingBottom: '32px' }}>
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 px-4" style={{ marginBottom: '16px' }}>Simple, Transparent Pricing</h2>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed" style={{ maxWidth: '48rem', margin: '0 auto', textAlign: 'center', paddingLeft: '16px', paddingRight: '16px', paddingBottom: '16px' }}>
             Choose the plan that fits your business. Add extra users anytime at $25/user/month
           </p>
         </div>
@@ -80,22 +80,22 @@ export default function Pricing() {
           backgroundColor: '#FEF3C7',
           border: '2px solid #EAB308',
           borderRadius: '16px',
-          padding: '24px 32px',
-          marginBottom: '48px',
+          padding: '20px 16px',
+          marginBottom: '32px',
           textAlign: 'center',
           maxWidth: '600px',
-          margin: '0 auto 48px'
+          margin: '0 auto 32px'
         }}>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#92400E', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#92400E', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             ⚡ Limited Time Offer
           </div>
-          <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827', marginBottom: '8px' }}>
+          <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827', marginBottom: '8px' }}>
             Lock in Your Founding Member Rates
           </div>
-          <p style={{ fontSize: '15px', color: '#6B7280', marginBottom: '12px' }}>
+          <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '12px', paddingLeft: '12px', paddingRight: '12px' }}>
             Sign up now and lock in these prices for as long as you stay subscribed. Prices will increase as we build out features—if you cancel and rejoin later, new pricing applies.
           </p>
-          <div style={{ fontSize: '13px', color: '#92400E', fontWeight: 600 }}>
+          <div style={{ fontSize: '12px', color: '#92400E', fontWeight: 600 }}>
             Get grandfathered-in pricing while it lasts
           </div>
         </div>
@@ -158,10 +158,10 @@ export default function Pricing() {
         </div>
 
         {/* Feature Comparison Table */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden" style={{ marginTop: '80px', marginBottom: '80px' }}>
-          <div style={{ padding: '48px 32px', borderBottom: '1px solid #E5E7EB' }}>
-            <h3 className="text-3xl font-bold text-gray-900">Feature Comparison</h3>
-            <p className="text-gray-600 mt-2">See exactly what's included in each plan</p>
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden" style={{ marginTop: '40px', marginBottom: '40px' }}>
+          <div style={{ padding: '24px 16px', borderBottom: '1px solid #E5E7EB' }}>
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Feature Comparison</h3>
+            <p className="text-gray-600 mt-2 text-sm md:text-base">See exactly what's included in each plan</p>
           </div>
 
           <div style={{ overflowX: 'auto' }}>

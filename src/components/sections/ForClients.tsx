@@ -19,16 +19,16 @@ export default function ForClients() {
   ]
 
   return (
-    <section id="for-clients" className="bg-white" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+    <section id="for-clients" className="bg-white" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
       <div className="container-custom">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900">Peace of Mind for Home Owners</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 text-gray-900 px-4">Peace of Mind for Home Owners</h2>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
             Clients get transparent visibility into their building projects
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 md:mb-16">
           {benefits.map((benefit, idx) => (
             <div key={idx} className="flex gap-6">
               <div className="flex-shrink-0">
@@ -39,15 +39,15 @@ export default function ForClients() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-lg mb-2 text-gray-900">{benefit.title}</h3>
-                <p className="text-gray-600 text-base leading-relaxed">{benefit.description}</p>
+                <h3 className="font-semibold text-base md:text-lg mb-2 text-gray-900">{benefit.title}</h3>
+                <p className="text-gray-600 text-sm md:text-base leading-relaxed">{benefit.description}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-16 rounded-2xl p-10 bg-gray-50">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="mt-12 md:mt-16 rounded-2xl p-6 md:p-10 bg-gray-50">
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
             Included in Basic & Professional Plans
           </h3>
           <p className="text-base text-gray-700 mb-6 leading-relaxed">
@@ -63,7 +63,7 @@ export default function ForClients() {
             ].map((item, idx) => (
               <li key={idx} className="flex items-center gap-3">
                 <span className="text-builder-primary font-bold">✓</span>
-                <span className="text-gray-700">{item}</span>
+                <span className="text-gray-700 text-sm md:text-base">{item}</span>
               </li>
             ))}
           </ul>

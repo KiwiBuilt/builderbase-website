@@ -12,7 +12,7 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="container-custom">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Image
@@ -20,7 +20,7 @@ export default function Header() {
               alt="BUILDER BASE - Construction Management Software"
               width={100}
               height={100}
-              className="h-24 w-auto"
+              className="h-14 md:h-20 w-auto"
               priority
             />
           </Link>

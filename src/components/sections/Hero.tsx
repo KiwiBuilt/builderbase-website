@@ -10,35 +10,35 @@ export default function Hero() {
   const [demoModalOpen, setDemoModalOpen] = useState(false)
 
   return (
-    <section style={{ paddingTop: '75px', paddingBottom: '256px', background: 'white' }}>
+    <section style={{ paddingTop: '60px', paddingBottom: '80px', paddingLeft: '16px', paddingRight: '16px', background: 'white' }}>
       <div className="container-custom">
         <div className="animate-slide-up text-center">
           {/* Logo */}
-          <div className="mb-12 flex justify-center">
+          <div className="mb-8 md:mb-12 flex justify-center">
             <Image
               src="/builderbase_logo.png"
               alt="BUILDER BASE"
               width={480}
               height={480}
               className="w-auto"
-              style={{ height: '448px' }}
+              style={{ height: 'auto', maxHeight: '280px', width: 'auto' }}
               priority
             />
           </div>
           
-          <h1 className="text-7xl md:text-9xl font-black mb-8 text-gray-900 leading-none text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-black mb-6 md:mb-8 text-gray-900 leading-tight md:leading-none text-center">
             Construction Management
             <span className="block" style={{ color: '#EAB308' }}>Simplified</span>
           </h1>
-          <p className="text-3xl text-gray-700 font-semibold leading-relaxed text-center" style={{ marginTop: '64px', marginBottom: '64px' }}>
+          <p className="text-lg sm:text-xl md:text-3xl text-gray-700 font-semibold leading-relaxed text-center" style={{ marginTop: '32px', marginBottom: '40px', paddingLeft: '16px', paddingRight: '16px' }}>
             Builderbase: The digital backbone of your build.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <button onClick={() => setModalOpen(true)} className="btn-primary text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
+          <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center mb-12 md:mb-16 px-4 sm:px-0">
+            <button onClick={() => setModalOpen(true)} className="btn-primary text-base md:text-lg" style={{ fontSize: 'inherit', padding: '0.875rem 2rem' }}>
               Start Free Trial
             </button>
-            <button onClick={() => setDemoModalOpen(true)} className="btn-outline text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
+            <button onClick={() => setDemoModalOpen(true)} className="btn-outline text-base md:text-lg" style={{ fontSize: 'inherit', padding: '0.875rem 2rem' }}>
               Schedule a Demo
             </button>
           </div>

@@ -40,18 +40,18 @@ export default function ForBuilders() {
   ]
 
   return (
-    <section id="for-builders" className="bg-gray-50" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+    <section id="for-builders" className="bg-gray-50" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
       <div className="container-custom">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900">Built for How NZ Builders Actually Work</h2>
-          <p className="text-xl text-gray-600 leading-relaxed" style={{ maxWidth: '48rem', margin: '0 auto', textAlign: 'center' }}>
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 text-gray-900 px-4">Built for How NZ Builders Actually Work</h2>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed" style={{ maxWidth: '48rem', margin: '0 auto', textAlign: 'center', paddingLeft: '16px', paddingRight: '16px' }}>
             Offline-capable, multi-site ready, and designed for tight margins. Not some imported system that doesn't get it.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-12 md:mb-16">
           {benefits.map((benefit, idx) => (
-            <div key={idx} className="bg-white p-8 rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <div key={idx} className="bg-white p-6 md:p-8 rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300">
               <div className="text-xs font-bold mb-3 tracking-wide" style={{ color: '#EAB308' }}>
                 {benefit.category}
               </div>
@@ -62,8 +62,8 @@ export default function ForBuilders() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900">{benefit.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{benefit.description}</p>
+                  <h3 className="font-semibold text-base md:text-lg mb-2 text-gray-900">{benefit.title}</h3>
+                  <p className="text-gray-600 text-sm md:text-base leading-relaxed">{benefit.description}</p>
                 </div>
               </div>
             </div>
@@ -71,14 +71,14 @@ export default function ForBuilders() {
         </div>
 
         {/* CTA Section */}
-        <div className="rounded-2xl p-12 text-center bg-gray-900" style={{ marginTop: '80px' }}>
-          <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <div className="rounded-2xl p-8 md:p-12 text-center bg-gray-900" style={{ marginTop: '40px' }}>
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 px-4">
             Ready to streamline your business?
           </h3>
-          <p className="text-lg text-gray-300 mb-8" style={{ maxWidth: '48rem', margin: '0 auto 2rem auto', textAlign: 'center', display: 'block' }}>
+          <p className="text-base md:text-lg text-gray-300 mb-6 md:mb-8" style={{ maxWidth: '48rem', margin: '0 auto 1.5rem auto', textAlign: 'center', paddingLeft: '16px', paddingRight: '16px' }}>
             See if it's the right fit for your build business—no credit card required
           </p>
-          <button onClick={() => setModalOpen(true)} className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity text-base" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
+          <button onClick={() => setModalOpen(true)} className="px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity text-base" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
             Start Your Free 14-Day Trial
           </button>
         </div>

@@ -3,6 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Image from '@tiptap/extension-image'
+import Link from '@tiptap/extension-link'
+import TextStyle from '@tiptap/extension-text-style'
+import Color from '@tiptap/extension-color'
+import Placeholder from '@tiptap/extension-placeholder'
+import { ref, uploadBytes, listAll, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/lib/firebase'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +34,26 @@ export default function BlogEditor() {
 
   const [loading, setLoading] = useState(!!blogId)
   const [saving, setSaving] = useState(false)
+  const [uploadedImages, setUploadedImages] = useState<string[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [showImageGallery, setShowImageGallery] = useState(false)
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [1, 2, 3, 4] },
+      }),
+      Image.configure({ inline: true }),
+      Link.configure({ openOnClick: false }),
+      TextStyle,
+      Color,
+      Placeholder.configure({ placeholder: 'Start writing your post...' }),
+    ],
+    content: blog.content || '',
+    onUpdate: ({ editor }) => {
+      setBlog((prev) => ({ ...prev, content: editor.getHTML() }))
+    },
+  })
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -69,6 +98,53 @@ export default function BlogEditor() {
       title,
       slug: prev.slug === '' ? generateSlug(title) : prev.slug,
     }))
+  }
+
+  // Load previously uploaded images on mount
+  useEffect(() => {
+    loadUploadedImages()
+  }, [])
+
+  const loadUploadedImages = async () => {
+    try {
+      const imagesRef = ref(storage, 'blog-images')
+      const result = await listAll(imagesRef)
+      const imageUrls = await Promise.all(
+        result.items.map((item) => getDownloadURL(item))
+      )
+      setUploadedImages(imageUrls)
+    } catch (error) {
+      console.error('Error loading images:', error)
+    }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    setUploading(true)
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const timestamp = Date.now()
+        const fileName = `${timestamp}-${file.name}`
+        const imageRef = ref(storage, `blog-images/${fileName}`)
+        await uploadBytes(imageRef, file)
+        const url = await getDownloadURL(imageRef)
+        setUploadedImages((prev) => [...prev, url])
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error)
+      alert('Error uploading images')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  const addImageToEditor = (imageUrl: string) => {
+    editor?.chain().focus().setImage({ src: imageUrl }).run()
+    setShowImageGallery(false)
   }
 
   const handleSave = async (publish: boolean) => {
@@ -256,32 +332,246 @@ export default function BlogEditor() {
             )}
           </div>
 
-          {/* Content */}
+          {/* Content Editor */}
           <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#374151' }}>
-              Content * (HTML or plain text)
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#374151' }}>
+              Content * (Visual Editor with Formatting)
             </label>
-            <textarea
-              value={blog.content}
-              onChange={(e) => setBlog((prev) => ({ ...prev, content: e.target.value }))}
-              placeholder="Enter your blog content here. You can use HTML tags like <h2>, <p>, <strong>, etc."
+
+            {/* Editor Toolbar */}
+            <div
               style={{
-                width: '100%',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
                 padding: '12px',
-                border: '1px solid #D1D5DB',
-                borderRadius: '6px',
-                fontSize: '14px',
-                minHeight: '400px',
-                boxSizing: 'border-box',
-                fontFamily: 'monospace',
+                backgroundColor: '#F9FAFB',
+                border: '1px solid #E5E7EB',
+                borderRadius: '6px 6px 0 0',
+                borderBottom: 'none',
               }}
-            />
-            <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '8px' }}>
-              💡 Tip: Use HTML tags for formatting. Example:&lt;h2&gt;Heading&lt;/h2&gt;, &lt;strong&gt;bold&lt;/strong&gt;, &lt;p&gt;paragraph&lt;/p&gt;
-            </p>
+            >
+              <button
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: editor?.isActive('bold') ? '#EAB308' : '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                }}
+              >
+                <strong>B</strong>
+              </button>
+
+              <button
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: editor?.isActive('italic') ? '#EAB308' : '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                <em>I</em>
+              </button>
+
+              <button
+                onClick={() => editor?.chain().focus().toggleStrike().run()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: editor?.isActive('strike') ? '#EAB308' : '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                <s>S</s>
+              </button>
+
+              <div style={{ width: '1px', backgroundColor: '#E5E7EB' }} />
+
+              <button
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: editor?.isActive('heading', { level: 2 }) ? '#EAB308' : '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                }}
+              >
+                H2
+              </button>
+
+              <button
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: editor?.isActive('heading', { level: 3 }) ? '#EAB308' : '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                H3
+              </button>
+
+              <div style={{ width: '1px', backgroundColor: '#E5E7EB' }} />
+
+              <button
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: editor?.isActive('bulletList') ? '#EAB308' : '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                • List
+              </button>
+
+              <button
+                onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: editor?.isActive('orderedList') ? '#EAB308' : '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                1. List
+              </button>
+
+              <div style={{ width: '1px', backgroundColor: '#E5E7EB' }} />
+
+              <label
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                🖼️ Image
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  style={{ display: 'none' }}
+                />
+              </label>
+
+              {uploadedImages.length > 0 && (
+                <button
+                  onClick={() => setShowImageGallery(!showImageGallery)}
+                  style={{
+                    padding: '6px 12px',
+                    backgroundColor: showImageGallery ? '#EAB308' : '#FFFFFF',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  📸 Gallery ({uploadedImages.length})
+                </button>
+              )}
+            </div>
+
+            {/* Image Gallery */}
+            {showImageGallery && (
+              <div
+                style={{
+                  padding: '12px',
+                  backgroundColor: '#F3F4F6',
+                  borderLeft: '1px solid #E5E7EB',
+                  borderRight: '1px solid #E5E7EB',
+                  borderBottom: '1px solid #E5E7EB',
+                }}
+              >
+                <p style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                  Click an image to insert it:
+                </p>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+                    gap: '8px',
+                  }}
+                >
+                  {uploadedImages.map((imageUrl, idx) => (
+                    <img
+                      key={idx}
+                      src={imageUrl}
+                      alt={`gallery-${idx}`}
+                      onClick={() => addImageToEditor(imageUrl)}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        objectFit: 'cover',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        border: '2px solid transparent',
+                        transition: 'border 0.2s',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#EAB308')}
+                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}
+                      title="Click to insert"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TipTap Editor */}
+            <div
+              style={{
+                border: '1px solid #D1D5DB',
+                borderStyle: showImageGallery ? 'solid solid solid solid' : 'none solid solid solid',
+                borderRadius: '0 0 6px 6px',
+              }}
+            >
+              <EditorContent
+                editor={editor}
+                style={{
+                  padding: '16px',
+                  minHeight: '400px',
+                  maxHeight: '600px',
+                  overflow: 'auto',
+                  backgroundColor: '#FFFFFF',
+                  fontSize: '16px',
+                  lineHeight: '1.6',
+                }}
+              />
+            </div>
+
+            {uploading && (
+              <p style={{ fontSize: '12px', color: '#3B82F6', marginTop: '8px' }}>
+                ⏳ Uploading images...
+              </p>
+            )}
           </div>
 
-          {/* SEO Fields */}
+          {/* SEO Settings with Optimization Checklist */}
           <div
             style={{
               padding: '20px',
@@ -291,10 +581,10 @@ export default function BlogEditor() {
             }}
           >
             <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', color: '#111827' }}>
-              SEO Settings
+              🔍 SEO Settings & Optimization
             </h3>
 
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label
                 style={{
                   display: 'block',
@@ -304,7 +594,39 @@ export default function BlogEditor() {
                   color: '#374151',
                 }}
               >
-                Meta Description (160 chars max)
+                Focus Keyword (for SEO optimization)
+              </label>
+              <input
+                type="text"
+                value={blog.keywords}
+                onChange={(e) => setBlog((prev) => ({ ...prev, keywords: e.target.value }))}
+                placeholder="e.g., construction management NZ, builder software"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box',
+                  marginBottom: '8px',
+                }}
+              />
+              <p style={{ fontSize: '12px', color: '#6B7280' }}>
+                What should Google rank this post for?
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  marginBottom: '8px',
+                  color: '#374151',
+                }}
+              >
+                Meta Description (160 chars - appears in Google)
               </label>
               <textarea
                 value={blog.metaDescription}
@@ -314,7 +636,7 @@ export default function BlogEditor() {
                     metaDescription: e.target.value.slice(0, 160),
                   }))
                 }
-                placeholder="Description for search engines..."
+                placeholder="Write a compelling summary that'll show in Google search results..."
                 style={{
                   width: '100%',
                   padding: '10px 12px',
@@ -326,36 +648,93 @@ export default function BlogEditor() {
                 }}
               />
               <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
-                {blog.metaDescription.length} / 160
+                {blog.metaDescription.length} / 160 characters
               </p>
             </div>
 
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  marginBottom: '8px',
-                  color: '#374151',
-                }}
-              >
-                Keywords
-              </label>
-              <input
-                type="text"
-                value={blog.keywords}
-                onChange={(e) => setBlog((prev) => ({ ...prev, keywords: e.target.value }))}
-                placeholder="comma, separated, keywords"
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box',
-                }}
-              />
+            {/* SEO Optimization Checklist */}
+            <div
+              style={{
+                padding: '16px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '6px',
+                border: '1px solid #E5E7EB',
+              }}
+            >
+              <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#111827' }}>
+                ✅ SEO Optimization Tasks
+              </h4>
+              <div style={{ space: '8px' }}>
+                {[
+                  {
+                    done: blog.title.length > 0,
+                    label: 'Add a title',
+                    priority: 'CRITICAL',
+                  },
+                  {
+                    done: blog.featuredImage.length > 0,
+                    label: 'Add a featured image',
+                    priority: 'HIGH',
+                  },
+                  {
+                    done: blog.content.length > 100,
+                    label: 'Write substantial content (100+ chars)',
+                    priority: 'HIGH',
+                  },
+                  {
+                    done: blog.metaDescription.length > 30,
+                    label: 'Write meta description (30+ chars)',
+                    priority: 'HIGH',
+                  },
+                  {
+                    done: blog.keywords.length > 0,
+                    label: 'Set focus keyword',
+                    priority: 'MEDIUM',
+                  },
+                  {
+                    done: blog.excerpt.length > 0,
+                    label: 'Write an excerpt',
+                    priority: 'MEDIUM',
+                  },
+                ].map((task, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '8px',
+                      marginBottom: '8px',
+                      backgroundColor: task.done ? '#DBEAFE' : '#FEF3C7',
+                      borderRadius: '4px',
+                      fontSize: '13px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        marginRight: '10px',
+                        fontSize: '16px',
+                      }}
+                    >
+                      {task.done ? '✅' : '⭕'}
+                    </span>
+                    <span style={{ flex: 1, color: task.done ? '#0369A1' : '#92400E' }}>
+                      {task.label}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        padding: '2px 6px',
+                        backgroundColor: task.priority === 'CRITICAL' ? '#FEE2E2' : task.priority === 'HIGH' ? '#FDD835' : '#E0E7FF',
+                        color: task.priority === 'CRITICAL' ? '#991B1B' : task.priority === 'HIGH' ? '#92400E' : '#3730A3',
+                        borderRadius: '3px',
+                      }}
+                    >
+                      {task.priority}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

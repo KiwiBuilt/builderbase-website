@@ -71,9 +71,9 @@ export default function ForBuilders() {
           <p className="text-lg text-gray-300 mb-8" style={{ maxWidth: '48rem', margin: '0 auto 2rem auto', textAlign: 'center', display: 'block' }}>
             See if it's the right fit for your build business—no credit card required
           </p>
-          <button className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity text-base" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
+          <a href="https://app.builderbase.co.nz" className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity text-base inline-block" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
             Start Your Free 14-Day Trial
-          </button>
+          </a>
         </div>
       </div>
     </section>

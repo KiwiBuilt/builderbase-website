@@ -27,12 +27,12 @@ export default function Hero() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <button className="btn-primary text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
+            <a href="https://app.builderbase.co.nz" className="btn-primary text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
               Start Free Trial
-            </button>
-            <button className="btn-outline text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
+            </a>
+            <a href="https://app.builderbase.co.nz" className="btn-outline text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
               Schedule a Demo
-            </button>
+            </a>
           </div>
 
           {/* Trust Badge */}

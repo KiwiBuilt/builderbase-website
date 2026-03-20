@@ -99,11 +99,12 @@ export default function Pricing() {
                   <span className="text-gray-600">{plan.period}</span>
                 </div>
 
-                <button
-                  className={plan.highlighted ? 'btn-primary w-full mb-8' : 'btn-secondary w-full mb-8'}
+                <a
+                  href="https://app.builderbase.co.nz"
+                  className={plan.highlighted ? 'btn-primary w-full mb-8 block text-center' : 'btn-secondary w-full mb-8 block text-center'}
                 >
                   {plan.cta}
-                </button>
+                </a>
 
                 <div className="space-y-4">
                   {plan.features.map((feature, fidx) => (

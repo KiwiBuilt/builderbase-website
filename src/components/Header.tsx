@@ -38,12 +38,12 @@ export default function Header() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <button className="btn-secondary text-sm">
+            <a href="https://app.builderbase.co.nz" className="btn-secondary text-sm">
               Sign In
-            </button>
-            <button className="btn-primary text-sm">
+            </a>
+            <a href="https://app.builderbase.co.nz" className="btn-primary text-sm">
               Start Free Trial
-            </button>
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -63,7 +63,7 @@ export default function Header() {
             <Link href="#features" className="text-gray-600 hover:text-gray-900">Features</Link>
             <Link href="#for-builders" className="text-gray-600 hover:text-gray-900">For Builders</Link>
             <Link href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
-            <button className="btn-primary w-full text-sm">Start Free Trial</button>
+            <a href="https://app.builderbase.co.nz" className="btn-primary w-full text-sm">Start Free Trial</a>
           </nav>
         )}
       </div>

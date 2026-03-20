@@ -5,6 +5,7 @@ import TrialModal from '../TrialModal'
 
 export default function Pricing() {
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<string | undefined>(undefined)
 
   const plans = [
     {
@@ -107,7 +108,10 @@ export default function Pricing() {
                 </div>
 
                 <button
-                  onClick={() => setModalOpen(true)}
+                  onClick={() => {
+                    setSelectedPlan(plan.name)
+                    setModalOpen(true)
+                  }}
                   className={plan.highlighted ? 'btn-primary w-full mb-8' : 'btn-secondary w-full mb-8'}
                 >
                   {plan.cta}
@@ -163,7 +167,11 @@ export default function Pricing() {
         </div>
       </div>
 
-      <TrialModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <TrialModal 
+        isOpen={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+        preSelectedPlan={selectedPlan}
+      />
     </section>
   )
 }

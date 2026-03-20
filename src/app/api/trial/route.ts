@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, company, email, phone, team_size, message } = body
+    const { name, company, email, phone, team_size, message, plan } = body
 
     // Create transporter
     const transporter = nodemailer.createTransport({
@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
     // Email content
     const htmlContent = `
       <h2>New Trial Request - BUILDER BASE</h2>
+      <p><strong>Plan:</strong> ${plan || 'Not specified'}</p>
       <p><strong>Name:</strong> ${name}</p>
       <p><strong>Company:</strong> ${company}</p>
       <p><strong>Email:</strong> ${email}</p>

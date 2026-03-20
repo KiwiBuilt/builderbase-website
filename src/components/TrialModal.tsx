@@ -1,14 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface TrialModalProps {
   isOpen: boolean
   onClose: () => void
+  preSelectedPlan?: string
 }
 
-export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
+export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialModalProps) {
   const [submitted, setSubmitted] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState(preSelectedPlan || '')
+
+  // Update selected plan when preSelectedPlan changes
+  useEffect(() => {
+    setSelectedPlan(preSelectedPlan || '')
+  }, [preSelectedPlan])
 
   if (!isOpen) return null
 
@@ -17,6 +24,8 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
     
     const form = e.currentTarget
     const formData = new FormData(form)
+    const data = Object.fromEntries(formData)
+    data.plan = selectedPlan
     
     try {
       const response = await fetch('/api/trial', {
@@ -24,7 +33,7 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(Object.fromEntries(formData))
+        body: JSON.stringify(data)
       })
       
       if (response.ok) {
@@ -106,6 +115,66 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
           onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
         >
+          {/* Plan Selection */}
+          <div>
+            <label className="block font-semibold text-gray-800 mb-3" style={{ fontSize: '14px' }}>
+              Select Your Plan *
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[
+                { value: 'Essential Builder', label: 'Essential Builder', price: '$69/month', desc: '3 team members' },
+                { value: 'Basic Builder', label: 'Basic Builder', price: '$199/month', desc: '5 team members' },
+                { value: 'Professional', label: 'Professional', price: '$399/month', desc: '15 team members' },
+              ].map((plan) => (
+                <label
+                  key={plan.value}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '14px 16px',
+                    border: selectedPlan === plan.value ? '2px solid #EAB308' : '2px solid #E5E7EB',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    backgroundColor: selectedPlan === plan.value ? '#FEF3C7' : 'white',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedPlan !== plan.value) {
+                      e.currentTarget.style.borderColor = '#D1D5DB'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedPlan !== plan.value) {
+                      e.currentTarget.style.borderColor = '#E5E7EB'
+                    }
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="plan"
+                    value={plan.value}
+                    checked={selectedPlan === plan.value}
+                    onChange={(e) => setSelectedPlan(e.target.value)}
+                    required
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      marginRight: '12px',
+                      accentColor: '#EAB308',
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, color: '#111827', fontSize: '16px' }}>{plan.label}</div>
+                    <div style={{ fontSize: '14px', color: '#6B7280', marginTop: '2px' }}>
+                      {plan.price} • {plan.desc}
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
           {/* Name */}
           <div>
             <label htmlFor="name" className="block font-semibold text-gray-800 mb-2" style={{ fontSize: '14px' }}>

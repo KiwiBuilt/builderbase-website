@@ -16,4 +16,3 @@ Crawl-delay: 1
 
 # Sitemap location
 Sitemap: https://builderbase.co.nz/sitemap.xml
-Sitemap: https://builderbase.co.nz/sitemap.xml

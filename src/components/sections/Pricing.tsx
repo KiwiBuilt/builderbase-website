@@ -69,9 +69,9 @@ export default function Pricing() {
     <section id="pricing" className="bg-gray-50" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
       <div className="container-custom">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900">Simple, Transparent Pricing</h2>
+          <h2 className="text-5xl md:text-6xl font-bold text-gray-900" style={{ marginBottom: '32px' }}>Simple, Transparent Pricing</h2>
           <p className="text-xl text-gray-600 leading-relaxed" style={{ maxWidth: '48rem', margin: '0 auto', textAlign: 'center', paddingBottom: '32px' }}>
-            Choose the plan that fits your business. Add extra users anytime at $30/user/month
+            Choose the plan that fits your business. Add extra users anytime at $25/user/month
           </p>
         </div>
 
@@ -199,7 +199,7 @@ export default function Pricing() {
                   { feature: 'Certificate Tracking', essential: '—', basic: '—', professional: '✓' },
                   { feature: 'Issues Tracking', essential: '—', basic: '—', professional: '✓' },
                   { feature: 'Email Support', essential: '✓', basic: '✓', professional: '✓' },
-                  { feature: 'Extra Users', essential: '$30/user/month', basic: '$30/user/month', professional: '$30/user/month' },
+                  { feature: 'Extra Users', essential: '$25/user/month', basic: '$25/user/month', professional: '$25/user/month' },
                 ].map((row, idx) => (
                   <tr 
                     key={idx} 

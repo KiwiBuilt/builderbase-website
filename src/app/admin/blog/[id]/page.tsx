@@ -7,8 +7,6 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
-import TextStyle from '@tiptap/extension-text-style'
-import Color from '@tiptap/extension-color'
 import Placeholder from '@tiptap/extension-placeholder'
 import { ref, uploadBytes, listAll, getDownloadURL } from 'firebase/storage'
 import { storage } from '@/lib/firebase'
@@ -45,8 +43,6 @@ export default function BlogEditor() {
       }),
       Image.configure({ inline: true }),
       Link.configure({ openOnClick: false }),
-      TextStyle,
-      Color,
       Placeholder.configure({ placeholder: 'Start writing your post...' }),
     ],
     content: blog.content || '',
@@ -664,7 +660,7 @@ export default function BlogEditor() {
               <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#111827' }}>
                 ✅ SEO Optimization Tasks
               </h4>
-              <div style={{ space: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {[
                   {
                     done: blog.title.length > 0,

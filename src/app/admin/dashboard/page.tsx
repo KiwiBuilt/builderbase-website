@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import AnalyticsDashboard from '@/components/AnalyticsDashboard'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,7 @@ export default function AdminDashboard() {
   const [blogs, setBlogs] = useState<any[]>([])
   const [stats, setStats] = useState({ totalVisits: 0, totalBlogs: 0, pendingComments: 0 })
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('overview')
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -115,180 +117,154 @@ export default function AdminDashboard() {
           </Link>
         </div>
 
-        {/* Stats */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '20px',
-            marginBottom: '32px',
-          }}
-        >
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', borderBottom: '2px solid #E5E7EB' }}>
           {[
-            { label: 'Total Blog Posts', value: stats.totalBlogs, color: '#3B82F6' },
-            { label: 'Pending Comments', value: stats.pendingComments, color: '#F59E0B' },
-            { label: 'Visitor Tracking', value: 'Active', color: '#10B981' },
-          ].map((stat, idx) => (
-            <div
-              key={idx}
+            { id: 'overview', label: 'Overview' },
+            { id: 'analytics', label: '📊 Site Stats & Analytics' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
               style={{
-                backgroundColor: '#FFFFFF',
-                padding: '24px',
-                borderRadius: '12px',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                padding: '12px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                border: 'none',
+                borderBottom: activeTab === tab.id ? '3px solid #EAB308' : 'none',
+                backgroundColor: 'transparent',
+                color: activeTab === tab.id ? '#EAB308' : '#6B7280',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
               }}
             >
-              <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>{stat.label}</p>
-              <div
-                style={{
-                  fontSize: '32px',
-                  fontWeight: 'bold',
-                  color: stat.color,
-                }}
-              >
-                {stat.value}
-              </div>
-            </div>
+              {tab.label}
+            </button>
           ))}
         </div>
 
-        {/* Blog List */}
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            overflow: 'hidden',
-          }}
-        >
-          <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>Recent Blog Posts</h2>
-          </div>
-
-          {blogs.length === 0 ? (
-            <div style={{ padding: '48px 24px', textAlign: 'center' }}>
-              <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '16px' }}>
-                No blog posts yet. Create your first one!
-              </p>
-              <Link
-                href="/admin/blog/new"
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#EAB308',
-                  color: '#111827',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  display: 'inline-block',
-                }}
-              >
-                Create Blog Post
-              </Link>
-            </div>
-          ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
-                  <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 600, color: '#6B7280' }}>
-                    Title
-                  </th>
-                  <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 600, color: '#6B7280' }}>
-                    Status
-                  </th>
-                  <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 600, color: '#6B7280' }}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {blogs.map((blog) => (
-                  <tr key={blog.id} style={{ borderBottom: '1px solid #E5E7EB' }}>
-                    <td style={{ padding: '16px 24px', color: '#111827' }}>{blog.title}</td>
-                    <td style={{ padding: '16px 24px', color: '#6B7280' }}>
-                      <span
-                        style={{
-                          padding: '4px 12px',
-                          backgroundColor: blog.published ? '#DBEAFE' : '#FEE2E2',
-                          color: blog.published ? '#0369A1' : '#991B1B',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {blog.published ? 'Published' : 'Draft'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <Link
-                        href={`/admin/blog/${blog.id}`}
-                        style={{
-                          marginRight: '12px',
-                          padding: '6px 12px',
-                          backgroundColor: '#3B82F6',
-                          color: 'white',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          textDecoration: 'none',
-                          display: 'inline-block',
-                        }}
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={async () => {
-                          if (confirm('Delete this blog post?')) {
-                            await fetch(`/api/blogs?id=${blog.id}`, { method: 'DELETE' })
-                            loadBlogs()
-                          }
-                        }}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#EF4444',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {/* Comments Management Link */}
-        {stats.pendingComments > 0 && (
-          <div
-            style={{
-              marginTop: '24px',
-              padding: '16px 24px',
-              backgroundColor: '#FEF3C7',
-              border: '1px solid #FCD34D',
-              borderRadius: '8px',
-              cursor: 'pointer',
-            }}
-          >
-            <Link
-              href="/admin/comments"
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <>
+            {/* Stats */}
+            <div
               style={{
-                display: 'block',
-                color: '#92400E',
-                fontWeight: 600,
-                textDecoration: 'none',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '20px',
+                marginBottom: '32px',
               }}
             >
-              ⚠️ You have {stats.pendingComments} pending {stats.pendingComments === 1 ? 'comment' : 'comments'} to review
-            </Link>
-          </div>
+              {[
+                { label: 'Total Blog Posts', value: stats.totalBlogs, color: '#3B82F6' },
+                { label: 'Pending Comments', value: stats.pendingComments, color: '#F59E0B' },
+                { label: 'Visitor Tracking', value: 'Active', color: '#10B981' },
+              ].map((stat, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    padding: '24px',
+                    borderRadius: '12px',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
+                  <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>{stat.label}</p>
+                  <div
+                    style={{
+                      fontSize: '32px',
+                      fontWeight: 'bold',
+                      color: stat.color,
+                    }}
+                  >
+                    {stat.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Blog List */}
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '12px',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden',
+              }}
+            >
+              <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>Recent Blog Posts</h2>
+              </div>
+
+                {blogs.length === 0 ? (
+                <p style={{ padding: '24px', color: '#6B7280' }}>No blog posts yet. Create one to get started!</p>
+              ) : (
+                <table style={{ width: '100%' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#111827' }}>
+                        Title
+                      </th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#111827' }}>
+                        Author
+                      </th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#111827' }}>
+                        Created
+                      </th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#111827' }}>
+                        Status
+                      </th>
+                      <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#111827' }}>
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {blogs.map((blog) => (
+                      <tr key={blog.id} style={{ borderBottom: '1px solid #E5E7EB' }}>
+                        <td style={{ padding: '16px', color: '#111827' }}>{blog.title}</td>
+                        <td style={{ padding: '16px', color: '#6B7280' }}>{blog.author}</td>
+                        <td style={{ padding: '16px', color: '#6B7280' }}>
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </td>
+                        <td style={{ padding: '16px' }}>
+                          <span
+                            style={{
+                              padding: '4px 12px',
+                              backgroundColor: blog.published ? '#D1E7DD' : '#FFF3CD',
+                              color: blog.published ? '#0B5313' : '#664D03',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {blog.published ? 'Published' : 'Draft'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '16px', textAlign: 'center' }}>
+                          <Link
+                            href={`/admin/blog/${blog.id}`}
+                            style={{
+                              color: '#3B82F6',
+                              textDecoration: 'none',
+                              fontSize: '14px',
+                              fontWeight: '600',
+                            }}
+                          >
+                            Edit
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </>
         )}
+
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && <AnalyticsDashboard />}
       </div>
     </div>
   )

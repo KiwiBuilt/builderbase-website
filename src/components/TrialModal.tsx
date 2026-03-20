@@ -28,6 +28,20 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
     data.plan = selectedPlan
     
     try {
+      // Track the trial signup event
+      await fetch('/api/analytics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          page: window.location.pathname,
+          event: 'trial_signup',
+          device: /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+          referrer: document.referrer || 'direct',
+        })
+      }).catch(() => {}) // Silent fail - don't block form submission
+      
       const response = await fetch('/api/trial', {
         method: 'POST',
         headers: {

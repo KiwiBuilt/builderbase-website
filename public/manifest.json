@@ -1,0 +1,17 @@
+{
+  "name": "BUILDER BASE",
+  "short_name": "BUILDER BASE",
+  "description": "Construction management software for New Zealand builders",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#EAB308",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

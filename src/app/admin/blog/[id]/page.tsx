@@ -3,12 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
-import dynamicImport from 'next/dynamic'
-import 'react-quill/dist/quill.snow.css'
 
 export const dynamic = 'force-dynamic'
-
-const ReactQuill = dynamicImport(() => import('react-quill'), { ssr: false })
 
 export default function BlogEditor() {
   const { data: session, status } = useSession()
@@ -263,25 +259,26 @@ export default function BlogEditor() {
           {/* Content */}
           <div style={{ marginBottom: '24px' }}>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#374151' }}>
-              Content *
+              Content * (HTML or plain text)
             </label>
-            <div style={{ height: '400px', backgroundColor: '#FFFFFF' }}>
-              <ReactQuill
-                value={blog.content}
-                onChange={(value) => setBlog((prev) => ({ ...prev, content: value }))}
-                modules={{
-                  toolbar: [
-                    [{ header: [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['link', 'image'],
-                    ['clean'],
-                  ],
-                }}
-                style={{ height: '360px' }}
-              />
-            </div>
+            <textarea
+              value={blog.content}
+              onChange={(e) => setBlog((prev) => ({ ...prev, content: e.target.value }))}
+              placeholder="Enter your blog content here. You can use HTML tags like <h2>, <p>, <strong>, etc."
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontSize: '14px',
+                minHeight: '400px',
+                boxSizing: 'border-box',
+                fontFamily: 'monospace',
+              }}
+            />
+            <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '8px' }}>
+              💡 Tip: Use HTML tags for formatting. Example:&lt;h2&gt;Heading&lt;/h2&gt;, &lt;strong&gt;bold&lt;/strong&gt;, &lt;p&gt;paragraph&lt;/p&gt;
+            </p>
           </div>
 
           {/* SEO Fields */}

@@ -1,0 +1,32 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#1a1a1a"/>
+  
+  <!-- Gold accent bar -->
+  <rect width="1200" height="8" fill="#EAB308"/>
+  
+  <!-- Main content area -->
+  <rect y="8" width="1200" height="622" fill="#1a1a1a"/>
+  
+  <!-- Logo/Brand area -->
+  <circle cx="100" cy="100" r="50" fill="#EAB308"/>
+  <text x="100" y="110" font-size="40" font-weight="bold" text-anchor="middle" fill="#1a1a1a" font-family="Arial, sans-serif">BB</text>
+  
+  <!-- Main heading -->
+  <text x="150" y="80" font-size="64" font-weight="bold" fill="#FFFFFF" font-family="Arial, sans-serif">BUILDER BASE</text>
+  
+  <!-- Subheading -->
+  <text x="150" y="140" font-size="32" fill="#EAB308" font-family="Arial, sans-serif">Construction Management Software</text>
+  
+  <!-- Tagline -->
+  <text x="600" y="280" font-size="28" fill="#f5f5f5" text-anchor="middle" font-family="Arial, sans-serif">Job Costing • Invoicing • Mobile App • Team Management</text>
+  
+  <!-- CTA text -->
+  <text x="600" y="380" font-size="24" fill="#EAB308" text-anchor="middle" font-weight="bold" font-family="Arial, sans-serif">For NZ Builders</text>
+  
+  <!-- Features highlight -->
+  <text x="600" y="480" font-size="20" fill="#e0e0e0" text-anchor="middle" font-family="Arial, sans-serif">Free Trial • No Credit Card Required • Founding Member Pricing</text>
+  
+  <!-- URL -->
+  <text x="600" y="570" font-size="18" fill="#999999" text-anchor="middle" font-family="Arial, sans-serif">builderbase.co.nz</text>
+</svg>

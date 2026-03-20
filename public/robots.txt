@@ -1,6 +1,19 @@
+# BUILDER BASE - Allow all bots to crawl
 User-agent: *
 Allow: /
 Disallow: /.next/
 Disallow: /api/
+Disallow: /_next/
 
+# Specific rules for Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /.next/
+Disallow: /api/
+
+# Crawl delay to be respectful
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://builderbase.co.nz/sitemap.xml
 Sitemap: https://builderbase.co.nz/sitemap.xml

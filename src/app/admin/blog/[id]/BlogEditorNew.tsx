@@ -40,6 +40,10 @@ export default function BlogEditorNew() {
   const [showImageModal, setShowImageModal] = useState(false)
   const [generatingContent, setGeneratingContent] = useState(false)
   const [contentPrompt, setContentPrompt] = useState('')
+  const [showAISettings, setShowAISettings] = useState(false)
+  const [customRules, setCustomRules] = useState('')
+  const [topicContext, setTopicContext] = useState('')
+  const [aiMode, setAiMode] = useState<'content' | 'title' | 'complete'>('content')
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
 
   const editor = useEditor({
@@ -143,17 +147,49 @@ export default function BlogEditorNew() {
       const res = await fetch('/api/generateContent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: contentPrompt }),
+        body: JSON.stringify({ 
+          prompt: contentPrompt,
+          type: aiMode,
+          customRules,
+          topicContext,
+          category: blog.category,
+        }),
       })
 
       if (res.ok) {
-        const { content } = await res.json()
-        editor?.chain().focus().insertContent(content).run()
+        const data = await res.json()
+        
+        // Handle different response types
+        if (aiMode === 'complete') {
+          // Auto-fill all fields
+          setBlog((prev) => ({
+            ...prev,
+            title: data.title || prev.title,
+            metaDescription: data.metaDescription || prev.metaDescription,
+            keywords: data.keywords || prev.keywords,
+            content: data.content || prev.content,
+          }))
+          if (editor && data.content) {
+            editor.chain().focus().setContent(data.content).run()
+          }
+          alert('✅ Complete post generated! Review and adjust as needed.')
+        } else if (aiMode === 'title') {
+          // Auto-fill title options
+          setBlog((prev) => ({
+            ...prev,
+            title: data.title || prev.title,
+          }))
+          alert(`✅ Title generated: "${data.title}"\n\nAlternatives:\n${data.alternatives?.join('\n') || 'None'}`)
+        } else {
+          // Just content
+          editor?.chain().focus().insertContent(data.content).run()
+          alert('✅ Content generated! Review and edit as needed.')
+        }
+        
         setContentPrompt('')
-        alert('✅ Content generated! Review and edit as needed.')
       } else {
         const error = await res.json()
-        alert(`Error: ${error.error || 'Failed to generate content'}`)
+        alert(`Error: ${error.error || 'Failed to generate'}`)
       }
     } catch (error) {
       console.error('Error generating content:', error)
@@ -491,14 +527,86 @@ export default function BlogEditorNew() {
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             {/* AI Assistant */}
             <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#F0F9FF', borderLeft: '4px solid #3B82F6', borderRadius: '6px' }}>
-              <h3 style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#1E40AF' }}>
-                ✨ AI Content Helper
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 'bold', color: '#1E40AF', margin: 0 }}>
+                  ✨ AI Content Helper
+                </h3>
+                <button
+                  onClick={() => setShowAISettings(!showAISettings)}
+                  style={{
+                    padding: '4px 8px',
+                    fontSize: '11px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid #BFDBFE',
+                    borderRadius: '3px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    color: '#1E40AF',
+                  }}
+                >
+                  {showAISettings ? '⚙️ Hide Settings' : '⚙️ Settings'}
+                </button>
+              </div>
+
+              {/* AI Settings */}
+              {showAISettings && (
+                <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: '#E0F2FE', borderRadius: '4px', fontSize: '12px' }}>
+                  <div style={{ marginBottom: '8px' }}>
+                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Mode:</label>
+                    <select
+                      value={aiMode}
+                      onChange={(e) => setAiMode(e.target.value as any)}
+                      style={{ width: '100%', padding: '4px', fontSize: '11px' }}
+                    >
+                      <option value="content">📝 Generate Body Content</option>
+                      <option value="title">🎯 Generate Title Only</option>
+                      <option value="complete">⚡ Generate Everything (Title + Meta + Keywords + Content)</option>
+                    </select>
+                  </div>
+
+                  <div style={{ marginBottom: '8px' }}>
+                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Topic/Context Info (optional):</label>
+                    <textarea
+                      value={topicContext}
+                      onChange={(e) => setTopicContext(e.target.value)}
+                      placeholder="e.g., This post is about construction safety on residential builds. Focus on Auckland regulations and common hazards."
+                      style={{
+                        width: '100%',
+                        padding: '6px',
+                        fontSize: '11px',
+                        minHeight: '50px',
+                        border: '1px solid #BFDBFE',
+                        borderRadius: '3px',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '8px' }}>
+                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Custom Rules (optional):</label>
+                    <textarea
+                      value={customRules}
+                      onChange={(e) => setCustomRules(e.target.value)}
+                      placeholder="e.g., Always mention specific tools. Include cost estimates. Use real NZ examples."
+                      style={{
+                        width: '100%',
+                        padding: '6px',
+                        fontSize: '11px',
+                        minHeight: '50px',
+                        border: '1px solid #BFDBFE',
+                        borderRadius: '3px',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
               <input
                 type="text"
                 value={contentPrompt}
                 onChange={(e) => setContentPrompt(e.target.value)}
-                placeholder='e.g., "Write tips for scheduling construction projects"'
+                placeholder={aiMode === 'complete' ? 'e.g., "How to manage a construction project timeline"' : aiMode === 'title' ? 'e.g., "Construction safety tips"' : 'e.g., "Write tips for scheduling construction projects"'}
                 style={{
                   width: '100%',
                   padding: '8px 12px',
@@ -525,7 +633,7 @@ export default function BlogEditorNew() {
                   opacity: generatingContent || !contentPrompt.trim() ? 0.6 : 1,
                 }}
               >
-                {generatingContent ? '⏳ Generating...' : '🚀 Generate'}
+                {generatingContent ? '⏳ Generating...' : `🚀 Generate ${aiMode === 'complete' ? 'All' : aiMode === 'title' ? 'Title' : 'Content'}`}
               </button>
             </div>
 

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const SESSION_ID_KEY = 'builderbase_session_id'
 const SESSION_EXPIRES_DAYS = 30
+const PAGE_START_TIME_KEY = 'builderbase_page_start_time'
 
 /**
  * Get or create a session ID for the current visitor
@@ -31,12 +32,32 @@ export function getSessionId(): string {
 }
 
 /**
+ * Track time on current page (call when page starts)
+ */
+export function startPageTimer(): void {
+  if (typeof window === 'undefined') return
+  sessionStorage.setItem(PAGE_START_TIME_KEY, Date.now().toString())
+}
+
+/**
+ * Get duration spent on current page in seconds
+ */
+export function getPageDuration(): number {
+  if (typeof window === 'undefined') return 0
+  const startTime = sessionStorage.getItem(PAGE_START_TIME_KEY)
+  if (!startTime) return 0
+  const duration = (Date.now() - parseInt(startTime)) / 1000
+  return Math.round(duration)
+}
+
+/**
  * Track an analytics event
  */
 export async function trackEvent(eventData: {
   page?: string
   event?: string
   blogId?: string
+  timeOnPage?: number
 }) {
   try {
     await fetch('/api/analytics', {
@@ -46,6 +67,7 @@ export async function trackEvent(eventData: {
         page: eventData.page || window.location.pathname,
         event: eventData.event,
         blogId: eventData.blogId,
+        timeOnPage: eventData.timeOnPage || 0,
         device: /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
         referrer: document.referrer || 'direct',
         sessionId: getSessionId(),

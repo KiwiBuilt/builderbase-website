@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { trackEvent } from '@/lib/analytics'
 
 interface DemoModalProps {
@@ -11,6 +11,13 @@ interface DemoModalProps {
 export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
   const [submitted, setSubmitted] = useState(false)
 
+  useEffect(() => {
+    // Track form started when modal opens
+    if (isOpen) {
+      trackEvent({ event: 'form_started', page: '/demo' })
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -20,8 +27,8 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     const formData = new FormData(form)
     
     try {
-      // Track the demo request event
-      await trackEvent({ event: 'demo_request' })
+      // Track the demo form completion
+      await trackEvent({ event: 'form_completed' })
       
       const response = await fetch('/api/demo', {
         method: 'POST',

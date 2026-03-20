@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import AnalyticsDashboard from '@/components/AnalyticsDashboard'
+import AnalyticsDashboardEnhanced from '@/components/AnalyticsDashboardEnhanced'
 
 export const dynamic = 'force-dynamic'
 
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Analytics Tab */}
-        {activeTab === 'analytics' && <AnalyticsDashboard />}
+        {activeTab === 'analytics' && <AnalyticsDashboardEnhanced />}
       </div>
     </div>
   )

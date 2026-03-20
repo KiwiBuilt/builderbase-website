@@ -1,11 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { trackEvent } from '@/lib/analytics'
 import TrialModal from '../TrialModal'
 
 export default function Pricing() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    // Track pricing page view
+    trackEvent({ event: 'pricing_viewed' })
+  }, [])
 
   const plans = [
     {

@@ -16,7 +16,11 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
   // Update selected plan when preSelectedPlan changes
   useEffect(() => {
     setSelectedPlan(preSelectedPlan || '')
-  }, [preSelectedPlan])
+    // Track form started when modal opens
+    if (isOpen) {
+      trackEvent({ event: 'form_started', page: '/trial' })
+    }
+  }, [isOpen, preSelectedPlan])
 
   if (!isOpen) return null
 
@@ -29,8 +33,8 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
     data.plan = selectedPlan
     
     try {
-      // Track the trial signup event
-      await trackEvent({ event: 'trial_signup' })
+      // Track the trial form completion
+      await trackEvent({ event: 'form_completed' })
       
       const response = await fetch('/api/trial', {
         method: 'POST',

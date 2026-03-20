@@ -182,6 +182,22 @@ export default function BlogPostPage() {
               {blog.title}
             </h1>
 
+            <div style={{ marginBottom: '16px' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  backgroundColor: '#FEF3C7',
+                  color: '#92400E',
+                  padding: '4px 12px',
+                  borderRadius: '12px',
+                }}
+              >
+                {blog.category || 'General'}
+              </span>
+            </div>
+
             <div
               style={{
                 display: 'flex',

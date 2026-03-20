@@ -4,9 +4,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
+const CATEGORIES = ['All', 'General', 'Tips & Tricks', 'Case Studies', 'Updates', 'Guides', 'Industry News']
+
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState('All')
 
   useEffect(() => {
     loadBlogs()
@@ -65,6 +68,29 @@ export default function BlogPage() {
 
       {/* Blog List */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 16px' }}>
+        {/* Category Filter */}
+        <div style={{ marginBottom: '40px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: selectedCategory === cat ? '#EAB308' : '#FFFFFF',
+                border: `2px solid ${selectedCategory === cat ? '#EAB308' : '#E5E7EB'}`,
+                borderRadius: '24px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: selectedCategory === cat ? '#111827' : '#6B7280',
+                transition: 'all 0.2s',
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         {blogs.length === 0 ? (
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontSize: '18px', color: '#6B7280' }}>No blog posts yet. Check back soon!</p>
@@ -77,12 +103,14 @@ export default function BlogPage() {
               gap: '32px',
             }}
           >
-            {blogs.map((blog) => (
-              <Link
-                key={blog.id}
-                href={`/blog/${blog.slug}`}
-                style={{ textDecoration: 'none' }}
-              >
+            {blogs
+              .filter((blog) => selectedCategory === 'All' || blog.category === selectedCategory)
+              .map((blog) => (
+                <Link
+                  key={blog.id}
+                  href={`/blog/${blog.slug}`}
+                  style={{ textDecoration: 'none' }}
+                >
                 <div
                   style={{
                     backgroundColor: '#FFFFFF',
@@ -121,6 +149,21 @@ export default function BlogPage() {
 
                   {/* Content */}
                   <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ marginBottom: '8px' }}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          backgroundColor: '#FEF3C7',
+                          color: '#92400E',
+                          padding: '4px 12px',
+                          borderRadius: '12px',
+                        }}
+                      >
+                        {blog.category || 'General'}
+                      </span>
+                    </div>
                     <h2
                       style={{
                         fontSize: '20px',

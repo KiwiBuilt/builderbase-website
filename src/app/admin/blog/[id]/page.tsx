@@ -26,6 +26,7 @@ export default function BlogEditor() {
     content: '',
     metaDescription: '',
     keywords: '',
+    category: 'General',
     published: false,
     featuredImage: '',
   })
@@ -296,6 +297,32 @@ export default function BlogEditor() {
                 boxSizing: 'border-box',
               }}
             />
+          </div>
+
+          {/* Category */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#374151' }}>
+              Category
+            </label>
+            <select
+              value={blog.category}
+              onChange={(e) => setBlog((prev) => ({ ...prev, category: e.target.value }))}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            >
+              <option>General</option>
+              <option>Tips & Tricks</option>
+              <option>Case Studies</option>
+              <option>Updates</option>
+              <option>Guides</option>
+              <option>Industry News</option>
+            </select>
           </div>
 
           {/* Featured Image */}

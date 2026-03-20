@@ -70,16 +70,31 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl p-10 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ 
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(8px)'
+      }}
+    >
+      <div 
+        className="bg-white w-full max-h-[90vh] overflow-y-auto"
+        style={{
+          maxWidth: '600px',
+          borderRadius: '24px',
+          padding: '48px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+        }}
+      >
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-2">Start Your Free Trial</h3>
-            <p className="text-gray-600">Get started in less than a minute</p>
+            <h3 className="font-bold text-gray-900 mb-2" style={{ fontSize: '32px' }}>Start Your Free Trial</h3>
+            <p className="text-gray-600" style={{ fontSize: '16px' }}>Get started in less than a minute</p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            style={{ padding: '8px', borderRadius: '8px' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -89,11 +104,11 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-5"
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
         >
           {/* Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="name" className="block font-semibold text-gray-800 mb-2" style={{ fontSize: '14px' }}>
               Full Name *
             </label>
             <input
@@ -101,14 +116,28 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
               id="name"
               name="name"
               required
-              className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none text-gray-900"
+              className="w-full bg-white text-gray-900 outline-none transition-all"
+              style={{
+                padding: '14px 16px',
+                border: '2px solid #E5E7EB',
+                borderRadius: '12px',
+                fontSize: '16px'
+              }}
               placeholder="John Smith"
+              onFocus={(e) => {
+                e.target.style.borderColor = '#EAB308'
+                e.target.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E5E7EB'
+                e.target.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Company Name */}
           <div>
-            <label htmlFor="company" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="company" className="block font-semibold text-gray-800 mb-2" style={{ fontSize: '14px' }}>
               Company Name *
             </label>
             <input
@@ -116,14 +145,28 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
               id="company"
               name="company"
               required
-              className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none text-gray-900"
+              className="w-full bg-white text-gray-900 outline-none transition-all"
+              style={{
+                padding: '14px 16px',
+                border: '2px solid #E5E7EB',
+                borderRadius: '12px',
+                fontSize: '16px'
+              }}
               placeholder="ABC Construction Ltd"
+              onFocus={(e) => {
+                e.target.style.borderColor = '#EAB308'
+                e.target.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E5E7EB'
+                e.target.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="email" className="block font-semibold text-gray-800 mb-2" style={{ fontSize: '14px' }}>
               Email Address *
             </label>
             <input
@@ -131,14 +174,28 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
               id="email"
               name="email"
               required
-              className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none text-gray-900"
+              className="w-full bg-white text-gray-900 outline-none transition-all"
+              style={{
+                padding: '14px 16px',
+                border: '2px solid #E5E7EB',
+                borderRadius: '12px',
+                fontSize: '16px'
+              }}
               placeholder="john@abcconstruction.co.nz"
+              onFocus={(e) => {
+                e.target.style.borderColor = '#EAB308'
+                e.target.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E5E7EB'
+                e.target.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="phone" className="block font-semibold text-gray-800 mb-2" style={{ fontSize: '14px' }}>
               Phone Number *
             </label>
             <input
@@ -146,21 +203,49 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
               id="phone"
               name="phone"
               required
-              className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none text-gray-900"
+              className="w-full bg-white text-gray-900 outline-none transition-all"
+              style={{
+                padding: '14px 16px',
+                border: '2px solid #E5E7EB',
+                borderRadius: '12px',
+                fontSize: '16px'
+              }}
               placeholder="021 123 4567"
+              onFocus={(e) => {
+                e.target.style.borderColor = '#EAB308'
+                e.target.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E5E7EB'
+                e.target.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Team Size */}
           <div>
-            <label htmlFor="team_size" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="team_size" className="block font-semibold text-gray-800 mb-2" style={{ fontSize: '14px' }}>
               How many team members? *
             </label>
             <select
               id="team_size"
               name="team_size"
               required
-              className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none text-gray-900 bg-white"
+              className="w-full bg-white text-gray-900 outline-none transition-all"
+              style={{
+                padding: '14px 16px',
+                border: '2px solid #E5E7EB',
+                borderRadius: '12px',
+                fontSize: '16px'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#EAB308'
+                e.target.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E5E7EB'
+                e.target.style.boxShadow = 'none'
+              }}
             >
               <option value="">Select team size</option>
               <option value="1-3">1-3 people</option>
@@ -172,28 +257,49 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
 
           {/* Message (Optional) */}
           <div>
-            <label htmlFor="message" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="message" className="block font-semibold text-gray-800 mb-2" style={{ fontSize: '14px' }}>
               Message (Optional)
             </label>
             <textarea
               id="message"
               name="message"
               rows={3}
-              className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none text-gray-900 resize-none"
+              className="w-full bg-white text-gray-900 outline-none transition-all resize-none"
+              style={{
+                padding: '14px 16px',
+                border: '2px solid #E5E7EB',
+                borderRadius: '12px',
+                fontSize: '16px'
+              }}
               placeholder="Tell us about your business..."
+              onFocus={(e) => {
+                e.target.style.borderColor = '#EAB308'
+                e.target.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E5E7EB'
+                e.target.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 mt-6"
-            style={{ backgroundColor: '#EAB308', color: '#111827' }}
+            className="w-full font-semibold transition-all hover:opacity-90"
+            style={{
+              padding: '16px',
+              borderRadius: '12px',
+              backgroundColor: '#EAB308',
+              color: '#111827',
+              fontSize: '16px',
+              marginTop: '8px'
+            }}
           >
             Request Free Trial
           </button>
 
-          <p className="text-sm text-gray-500 text-center pt-2">
+          <p className="text-gray-500 text-center" style={{ fontSize: '14px', marginTop: '8px' }}>
             No credit card required • 14-day trial with full access
           </p>
         </form>

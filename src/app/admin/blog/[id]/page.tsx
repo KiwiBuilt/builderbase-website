@@ -47,6 +47,7 @@ export default function BlogEditor() {
       Placeholder.configure({ placeholder: 'Start writing your post...' }),
     ],
     content: blog.content || '',
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       setBlog((prev) => ({ ...prev, content: editor.getHTML() }))
     },

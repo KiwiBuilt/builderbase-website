@@ -43,7 +43,7 @@ export default function BlogEditorNew() {
   const [showAISettings, setShowAISettings] = useState(false)
   const [customRules, setCustomRules] = useState('')
   const [topicContext, setTopicContext] = useState('')
-  const [aiMode, setAiMode] = useState<'content' | 'title' | 'complete'>('content')
+  const [aiMode, setAiMode] = useState<'content' | 'title' | 'complete'>('complete')
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
 
   const editor = useEditor({
@@ -525,11 +525,11 @@ export default function BlogEditorNew() {
         {/* EDITOR */}
         <div style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            {/* AI Assistant */}
+            {/* AI Assistant - Topic Mode */}
             <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#F0F9FF', borderLeft: '4px solid #3B82F6', borderRadius: '6px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <h3 style={{ fontSize: '13px', fontWeight: 'bold', color: '#1E40AF', margin: 0 }}>
-                  ✨ AI Content Helper
+                  ✨ AI Blog Generator
                 </h3>
                 <button
                   onClick={() => setShowAISettings(!showAISettings)}
@@ -544,7 +544,7 @@ export default function BlogEditorNew() {
                     color: '#1E40AF',
                   }}
                 >
-                  {showAISettings ? '⚙️ Hide Settings' : '⚙️ Settings'}
+                  {showAISettings ? '⚙️ Hide Options' : '⚙️ More Options'}
                 </button>
               </div>
 
@@ -552,42 +552,24 @@ export default function BlogEditorNew() {
               {showAISettings && (
                 <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: '#E0F2FE', borderRadius: '4px', fontSize: '12px' }}>
                   <div style={{ marginBottom: '8px' }}>
-                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Mode:</label>
+                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Generation Mode:</label>
                     <select
                       value={aiMode}
                       onChange={(e) => setAiMode(e.target.value as any)}
-                      style={{ width: '100%', padding: '4px', fontSize: '11px' }}
+                      style={{ width: '100%', padding: '6px', fontSize: '11px', borderRadius: '3px', border: '1px solid #7DD3FC' }}
                     >
-                      <option value="content">📝 Generate Body Content</option>
-                      <option value="title">🎯 Generate Title Only</option>
-                      <option value="complete">⚡ Generate Everything (Title + Meta + Keywords + Content)</option>
+                      <option value="complete">⚡ Complete Post (Title + Meta + Keywords + Body)</option>
+                      <option value="content">📝 Body Content Only</option>
+                      <option value="title">🎯 Title Only</option>
                     </select>
                   </div>
 
                   <div style={{ marginBottom: '8px' }}>
-                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Topic/Context Info (optional):</label>
-                    <textarea
-                      value={topicContext}
-                      onChange={(e) => setTopicContext(e.target.value)}
-                      placeholder="e.g., This post is about construction safety on residential builds. Focus on Auckland regulations and common hazards."
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '11px',
-                        minHeight: '50px',
-                        border: '1px solid #BFDBFE',
-                        borderRadius: '3px',
-                        boxSizing: 'border-box',
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ marginBottom: '8px' }}>
-                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Custom Rules (optional):</label>
+                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '4px' }}>Post-Specific Rules (optional):</label>
                     <textarea
                       value={customRules}
                       onChange={(e) => setCustomRules(e.target.value)}
-                      placeholder="e.g., Always mention specific tools. Include cost estimates. Use real NZ examples."
+                      placeholder="e.g., Focus on budget tips. Include 5+ actionable steps. Add cost examples."
                       style={{
                         width: '100%',
                         padding: '6px',
@@ -602,38 +584,72 @@ export default function BlogEditorNew() {
                 </div>
               )}
 
-              <input
-                type="text"
-                value={contentPrompt}
-                onChange={(e) => setContentPrompt(e.target.value)}
-                placeholder={aiMode === 'complete' ? 'e.g., "How to manage a construction project timeline"' : aiMode === 'title' ? 'e.g., "Construction safety tips"' : 'e.g., "Write tips for scheduling construction projects"'}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #BFDBFE',
-                  borderRadius: '4px',
-                  fontSize: '13px',
-                  marginBottom: '8px',
-                  boxSizing: 'border-box',
-                }}
-                onKeyPress={(e) => e.key === 'Enter' && generateContent()}
-              />
+              {/* Main Topic Input - Always visible */}
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: '#1E40AF', display: 'block', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  📋 Topic/Subject (What do you want to write about?)
+                </label>
+                <input
+                  type="text"
+                  value={contentPrompt}
+                  onChange={(e) => setContentPrompt(e.target.value)}
+                  placeholder="e.g., 'How to manage construction costs on residential projects'"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #BFDBFE',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    marginBottom: '8px',
+                    boxSizing: 'border-box',
+                    backgroundColor: '#FFFFFF',
+                  }}
+                  onKeyPress={(e) => e.key === 'Enter' && generateContent()}
+                />
+              </div>
+
+              {/* Topic Context - Key field */}
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: '#1E40AF', display: 'block', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  ℹ️ Topic Information (Who is this for? What angle?)
+                </label>
+                <textarea
+                  value={topicContext}
+                  onChange={(e) => setTopicContext(e.target.value)}
+                  placeholder="e.g., 'For owner-builders doing their first residential project. Focus on common mistakes and how to avoid them. Include budget considerations for Auckland region.'"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #BFDBFE',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    minHeight: '70px',
+                    boxSizing: 'border-box',
+                    backgroundColor: '#FFFFFF',
+                  }}
+                />
+                <p style={{ fontSize: '10px', color: '#0369A1', marginTop: '4px', margin: '4px 0 0 0' }}>
+                  💡 Tip: The more detail you provide, the better the AI-generated content will be
+                </p>
+              </div>
+
               <button
                 onClick={generateContent}
                 disabled={generatingContent || !contentPrompt.trim()}
                 style={{
-                  padding: '6px 12px',
+                  width: '100%',
+                  padding: '10px 12px',
                   backgroundColor: '#3B82F6',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   opacity: generatingContent || !contentPrompt.trim() ? 0.6 : 1,
                 }}
               >
-                {generatingContent ? '⏳ Generating...' : `🚀 Generate ${aiMode === 'complete' ? 'All' : aiMode === 'title' ? 'Title' : 'Content'}`}
+                {generatingContent ? '⏳ Generating your post...' : `🚀 Generate ${aiMode === 'complete' ? 'Complete Post' : aiMode === 'title' ? 'Title' : 'Content'}`}
               </button>
             </div>
 

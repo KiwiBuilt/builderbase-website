@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +28,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Build the system instructions with custom rules
+    // Fetch global rules from Firestore
+    let globalRules = ''
+    try {
+      const settingsDoc = await getDoc(doc(db, 'settings', 'aiRules'))
+      if (settingsDoc.exists()) {
+        globalRules = settingsDoc.data()?.rules || ''
+      }
+    } catch (error) {
+      console.error('Error fetching global rules:', error)
+      // Continue without global rules if fetch fails
+    }
+
+    // Build the system instructions with custom + global rules
     let systemPrompt = `You are a professional blog writer for Builder Base - construction management software in New Zealand.
 
 CORE RULES (ALWAYS FOLLOW):
@@ -38,8 +52,12 @@ CORE RULES (ALWAYS FOLLOW):
 - Focus on NZ construction industry best practices
 - Be encouraging and supportive in tone`
 
+    if (globalRules) {
+      systemPrompt += `\n\nGLOBAL RULES (Apply to ALL posts):\n${globalRules}`
+    }
+
     if (customRules) {
-      systemPrompt += `\n\nCUSTOM RULES FOR THIS POST:\n${customRules}`
+      systemPrompt += `\n\nPOST-SPECIFIC RULES:\n${customRules}`
     }
 
     // Build context awareness

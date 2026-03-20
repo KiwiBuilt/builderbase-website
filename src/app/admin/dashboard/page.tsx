@@ -90,6 +90,8 @@ export default function AdminDashboard() {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '32px',
+            flexWrap: 'wrap',
+            gap: '12px',
           }}
         >
           <div>
@@ -98,23 +100,59 @@ export default function AdminDashboard() {
             </h1>
             <p style={{ fontSize: '16px', color: '#6B7280' }}>Welcome back, {session?.user?.name}</p>
           </div>
-          <Link
-            href="/admin/blog/new"
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#EAB308',
-              color: '#111827',
-              fontSize: '16px',
-              fontWeight: 600,
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textDecoration: 'none',
-              display: 'inline-block',
-            }}
-          >
-            + New Blog
-          </Link>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Link
+              href="/admin/gallery"
+              style={{
+                padding: '10px 16px',
+                backgroundColor: '#F3F4F6',
+                color: '#111827',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                display: 'inline-block',
+              }}
+            >
+              🖼️ Gallery
+            </Link>
+            <Link
+              href="/admin/settings"
+              style={{
+                padding: '10px 16px',
+                backgroundColor: '#F3F4F6',
+                color: '#111827',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                display: 'inline-block',
+              }}
+            >
+              ⚙️ AI Settings
+            </Link>
+            <Link
+              href="/admin/blog/new"
+              style={{
+                padding: '10px 16px',
+                backgroundColor: '#EAB308',
+                color: '#111827',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                display: 'inline-block',
+              }}
+            >
+              + New Blog
+            </Link>
+          </div>
         </div>
 
         {/* Tabs */}

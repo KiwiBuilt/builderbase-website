@@ -60,20 +60,30 @@ export async function trackEvent(eventData: {
   timeOnPage?: number
 }) {
   try {
-    await fetch('/api/analytics', {
+    const payload = {
+      page: eventData.page || window.location.pathname,
+      event: eventData.event,
+      blogId: eventData.blogId,
+      timeOnPage: eventData.timeOnPage || 0,
+      device: /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+      referrer: document.referrer || 'direct',
+      sessionId: getSessionId(),
+    }
+    
+    console.log('📊 Analytics tracking:', payload)
+    
+    const res = await fetch('/api/analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        page: eventData.page || window.location.pathname,
-        event: eventData.event,
-        blogId: eventData.blogId,
-        timeOnPage: eventData.timeOnPage || 0,
-        device: /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-        referrer: document.referrer || 'direct',
-        sessionId: getSessionId(),
-      }),
-    }).catch(() => {})
+      body: JSON.stringify(payload),
+    })
+    
+    if (res.ok) {
+      console.log('✅ Analytics tracked successfully')
+    } else {
+      console.error('❌ Analytics failed:', res.status, res.statusText)
+    }
   } catch (error) {
-    console.error('Error tracking event:', error)
+    console.error('❌ Analytics error:', error)
   }
 }

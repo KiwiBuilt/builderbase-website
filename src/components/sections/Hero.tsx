@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import TrialModal from '../TrialModal'
+import DemoModal from '../DemoModal'
 
 export default function Hero() {
   const [modalOpen, setModalOpen] = useState(false)
+  const [demoModalOpen, setDemoModalOpen] = useState(false)
 
   return (
     <section style={{ paddingTop: '75px', paddingBottom: '256px', background: 'white' }}>
@@ -36,7 +38,7 @@ export default function Hero() {
             <button onClick={() => setModalOpen(true)} className="btn-primary text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
               Start Free Trial
             </button>
-            <button onClick={() => setModalOpen(true)} className="btn-outline text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
+            <button onClick={() => setDemoModalOpen(true)} className="btn-outline text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
               Schedule a Demo
             </button>
           </div>
@@ -52,6 +54,7 @@ export default function Hero() {
       </div>
 
       <TrialModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <DemoModal isOpen={demoModalOpen} onClose={() => setDemoModalOpen(false)} />
     </section>
   )
 }

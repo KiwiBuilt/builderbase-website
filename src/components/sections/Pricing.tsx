@@ -132,6 +132,100 @@ export default function Pricing() {
           ))}
         </div>
 
+        {/* Feature Comparison Table */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden" style={{ marginTop: '80px', marginBottom: '80px' }}>
+          <div style={{ padding: '48px 32px', borderBottom: '1px solid #E5E7EB' }}>
+            <h3 className="text-3xl font-bold text-gray-900">Feature Comparison</h3>
+            <p className="text-gray-600 mt-2">See exactly what's included in each plan</p>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '2px solid #E5E7EB' }}>
+                  <th style={{ padding: '24px 32px', textAlign: 'left', fontWeight: 600, color: '#111827', fontSize: '16px' }}>
+                    Feature
+                  </th>
+                  <th style={{ padding: '24px 32px', textAlign: 'center', fontWeight: 600, color: '#111827', fontSize: '16px' }}>
+                    Essential
+                  </th>
+                  <th style={{ padding: '24px 32px', textAlign: 'center', fontWeight: 600, color: '#111827', fontSize: '16px', backgroundColor: '#FEF3C7' }}>
+                    Basic
+                  </th>
+                  <th style={{ padding: '24px 32px', textAlign: 'center', fontWeight: 600, color: '#111827', fontSize: '16px' }}>
+                    Professional
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: 'Team Members', essential: '3', basic: '5', professional: '15' },
+                  { feature: 'Unlimited Projects & Storage', essential: '✓', basic: '✓', professional: '✓' },
+                  { feature: 'Mobile App (Time Clock, Site Diary, Photos)', essential: '✓', basic: '✓', professional: '✓' },
+                  { feature: 'Mobile Tasks', essential: '—', basic: '✓', professional: '✓' },
+                  { feature: 'Job Costing & Estimates', essential: '✓', basic: '✓', professional: '✓' },
+                  { feature: 'Invoicing & Quotes', essential: '✓', basic: '✓', professional: '✓' },
+                  { feature: 'Scheduling', essential: 'Basic (List View)', basic: 'Full', professional: 'Full' },
+                  { feature: 'Client Portal', essential: '—', basic: '✓', professional: '✓' },
+                  { feature: 'Xero Integration', essential: '$10/month addon', basic: 'Included', professional: 'Included' },
+                  { feature: 'Staff Management Portal', essential: '—', basic: '—', professional: '✓' },
+                  { feature: 'Leave Management', essential: '—', basic: '—', professional: '✓' },
+                  { feature: 'Purchase Requests & Approvals', essential: '—', basic: '—', professional: '✓' },
+                  { feature: 'Certificate Tracking', essential: '—', basic: '—', professional: '✓' },
+                  { feature: 'Issues Tracking', essential: '—', basic: '—', professional: '✓' },
+                  { feature: 'Email Support', essential: '✓', basic: '✓', professional: '✓' },
+                  { feature: 'Extra Users', essential: '$30/user/month', basic: '$30/user/month', professional: '$30/user/month' },
+                ].map((row, idx) => (
+                  <tr 
+                    key={idx} 
+                    style={{ 
+                      borderBottom: '1px solid #E5E7EB',
+                      backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F9FAFB'
+                    }}
+                  >
+                    <td style={{ padding: '20px 32px', color: '#111827', fontSize: '15px', fontWeight: 500 }}>
+                      {row.feature}
+                    </td>
+                    <td style={{ padding: '20px 32px', textAlign: 'center', color: '#6B7280', fontSize: '15px' }}>
+                      {row.essential === '✓' ? (
+                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#EAB308' }}>✓</span>
+                      ) : row.essential === '—' ? (
+                        <span style={{ fontSize: '20px', color: '#D1D5DB' }}>—</span>
+                      ) : (
+                        row.essential
+                      )}
+                    </td>
+                    <td style={{ padding: '20px 32px', textAlign: 'center', color: '#6B7280', fontSize: '15px', backgroundColor: 'rgba(254, 243, 199, 0.3)' }}>
+                      {row.basic === '✓' ? (
+                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#EAB308' }}>✓</span>
+                      ) : row.basic === '—' ? (
+                        <span style={{ fontSize: '20px', color: '#D1D5DB' }}>—</span>
+                      ) : (
+                        row.basic
+                      )}
+                    </td>
+                    <td style={{ padding: '20px 32px', textAlign: 'center', color: '#6B7280', fontSize: '15px' }}>
+                      {row.professional === '✓' ? (
+                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#EAB308' }}>✓</span>
+                      ) : row.professional === '—' ? (
+                        <span style={{ fontSize: '20px', color: '#D1D5DB' }}>—</span>
+                      ) : (
+                        row.professional
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ padding: '32px', backgroundColor: '#F9FAFB', borderTop: '1px solid #E5E7EB', textAlign: 'center' }}>
+            <p style={{ color: '#6B7280', fontSize: '14px' }}>
+              💡 All plans include a <strong>free trial with full feature access</strong>. No credit card required.
+            </p>
+          </div>
+        </div>
+
         {/* FAQ */}
         <div className="bg-white rounded-2xl p-10 border border-gray-200" style={{ marginTop: '80px' }}>
           <h3 className="text-3xl font-bold text-gray-900" style={{ marginBottom: '48px' }}>Frequently Asked Questions</h3>

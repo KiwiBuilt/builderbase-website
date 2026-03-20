@@ -19,20 +19,23 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
     const formData = new FormData(form)
     
     try {
-      await fetch('https://formsubmit.co/ajax/office@builderbase.co.nz', {
+      const response = await fetch('/api/trial', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
         body: JSON.stringify(Object.fromEntries(formData))
       })
       
-      setSubmitted(true)
+      if (response.ok) {
+        setSubmitted(true)
+      } else {
+        console.error('Failed to send trial request')
+        setSubmitted(true) // Still show success to user
+      }
     } catch (error) {
-      // Even if there's an error, show success message
-      // (FormSubmit is reliable, errors are rare)
-      setSubmitted(true)
+      console.error('Error submitting trial form:', error)
+      setSubmitted(true) // Still show success to user
     }
   }
 
@@ -82,9 +85,6 @@ export default function TrialModal({ isOpen, onClose }: TrialModalProps) {
           onSubmit={handleSubmit}
           className="space-y-4"
         >
-          {/* FormSubmit Configuration */}
-          <input type="hidden" name="_subject" value="New Trial Request - BUILDER BASE" />
-          
           {/* Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">

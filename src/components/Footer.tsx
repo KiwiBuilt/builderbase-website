@@ -58,7 +58,7 @@ export default function Footer() {
               &copy; {currentYear} BUILDER BASE. All rights reserved.
             </p>
             <p className="text-sm text-gray-400">
-              Made for New Zealand builders
+              Made for New Zealand builders by <a href="https://www.kiwi-built.nz" target="_blank" rel="noopener noreferrer" className="text-yellow-500 hover:text-yellow-400 transition-colors font-semibold">KiwiBuilt</a>
             </p>
           </div>
         </div>

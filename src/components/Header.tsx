@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import TrialModal from './TrialModal'
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -41,9 +43,9 @@ export default function Header() {
             <a href="https://app.builderbase.co.nz" className="btn-secondary text-sm">
               Sign In
             </a>
-            <a href="https://app.builderbase.co.nz" className="btn-primary text-sm">
+            <button onClick={() => setModalOpen(true)} className="btn-primary text-sm">
               Start Free Trial
-            </a>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -63,10 +65,12 @@ export default function Header() {
             <Link href="#features" className="text-gray-600 hover:text-gray-900">Features</Link>
             <Link href="#for-builders" className="text-gray-600 hover:text-gray-900">For Builders</Link>
             <Link href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
-            <a href="https://app.builderbase.co.nz" className="btn-primary w-full text-sm">Start Free Trial</a>
+            <button onClick={() => setModalOpen(true)} className="btn-primary w-full text-sm">Start Free Trial</button>
           </nav>
         )}
       </div>
+
+      <TrialModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </header>
   )
 }

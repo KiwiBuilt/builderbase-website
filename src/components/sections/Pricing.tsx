@@ -1,4 +1,11 @@
+'use client'
+
+import { useState } from 'react'
+import TrialModal from '../TrialModal'
+
 export default function Pricing() {
+  const [modalOpen, setModalOpen] = useState(false)
+
   const plans = [
     {
       name: 'Essential Builder',
@@ -99,12 +106,12 @@ export default function Pricing() {
                   <span className="text-gray-600">{plan.period}</span>
                 </div>
 
-                <a
-                  href="https://app.builderbase.co.nz"
-                  className={plan.highlighted ? 'btn-primary w-full mb-8 block text-center' : 'btn-secondary w-full mb-8 block text-center'}
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className={plan.highlighted ? 'btn-primary w-full mb-8' : 'btn-secondary w-full mb-8'}
                 >
                   {plan.cta}
-                </a>
+                </button>
 
                 <div className="space-y-4">
                   {plan.features.map((feature, fidx) => (
@@ -155,6 +162,8 @@ export default function Pricing() {
           </div>
         </div>
       </div>
+
+      <TrialModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
   )
 }

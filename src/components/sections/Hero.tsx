@@ -1,6 +1,12 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
+import TrialModal from '../TrialModal'
 
 export default function Hero() {
+  const [modalOpen, setModalOpen] = useState(false)
+
   return (
     <section style={{ paddingTop: '75px', paddingBottom: '256px', background: 'white' }}>
       <div className="container-custom">
@@ -27,12 +33,12 @@ export default function Hero() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <a href="https://app.builderbase.co.nz" className="btn-primary text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
+            <button onClick={() => setModalOpen(true)} className="btn-primary text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
               Start Free Trial
-            </a>
-            <a href="https://app.builderbase.co.nz" className="btn-outline text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
+            </button>
+            <button onClick={() => setModalOpen(true)} className="btn-outline text-lg" style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}>
               Schedule a Demo
-            </a>
+            </button>
           </div>
 
           {/* Trust Badge */}
@@ -44,6 +50,8 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      <TrialModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
   )
 }

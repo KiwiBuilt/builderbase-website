@@ -1,4 +1,11 @@
+'use client'
+
+import { useState } from 'react'
+import TrialModal from '../TrialModal'
+
 export default function ForBuilders() {
+  const [modalOpen, setModalOpen] = useState(false)
+
   const benefits = [
     {
       category: 'For Profitability',
@@ -71,11 +78,13 @@ export default function ForBuilders() {
           <p className="text-lg text-gray-300 mb-8" style={{ maxWidth: '48rem', margin: '0 auto 2rem auto', textAlign: 'center', display: 'block' }}>
             See if it's the right fit for your build business—no credit card required
           </p>
-          <a href="https://app.builderbase.co.nz" className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity text-base inline-block" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
+          <button onClick={() => setModalOpen(true)} className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity text-base" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
             Start Your Free 14-Day Trial
-          </a>
+          </button>
         </div>
       </div>
+
+      <TrialModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
   )
 }

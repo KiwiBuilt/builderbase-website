@@ -1,4 +1,11 @@
+'use client'
+
+import { useState } from 'react'
+import TrialModal from '../TrialModal'
+
 export default function CTA() {
+  const [modalOpen, setModalOpen] = useState(false)
+
   return (
     <section className="py-48 bg-gray-900">
       <div className="container-custom">
@@ -11,12 +18,12 @@ export default function CTA() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <a href="https://app.builderbase.co.nz" className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity inline-block" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
+            <button onClick={() => setModalOpen(true)} className="px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: '#EAB308', color: '#111827' }}>
               Start Your Free Trial
-            </a>
-            <a href="https://app.builderbase.co.nz" className="text-white font-semibold border-2 border-white px-8 py-4 rounded-lg hover:bg-white hover:text-gray-900 transition-colors inline-block">
+            </button>
+            <button onClick={() => setModalOpen(true)} className="text-white font-semibold border-2 border-white px-8 py-4 rounded-lg hover:bg-white hover:text-gray-900 transition-colors">
               Schedule a Demo
-            </a>
+            </button>
           </div>
 
           <p className="text-sm text-gray-400">
@@ -24,6 +31,8 @@ export default function CTA() {
           </p>
         </div>
       </div>
+
+      <TrialModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
   )
 }

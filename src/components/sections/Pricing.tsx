@@ -75,6 +75,31 @@ export default function Pricing() {
           </p>
         </div>
 
+        {/* Founding Member Alert */}
+        <div style={{
+          backgroundColor: '#FEF3C7',
+          border: '2px solid #EAB308',
+          borderRadius: '16px',
+          padding: '24px 32px',
+          marginBottom: '48px',
+          textAlign: 'center',
+          maxWidth: '600px',
+          margin: '0 auto 48px'
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#92400E', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            ⚡ Limited Time Offer
+          </div>
+          <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827', marginBottom: '8px' }}>
+            Lock in Your Founding Member Rates
+          </div>
+          <p style={{ fontSize: '15px', color: '#6B7280', marginBottom: '12px' }}>
+            Sign up now and lock in these prices for as long as you stay subscribed. Prices will increase as we build out features—if you cancel and rejoin later, new pricing applies.
+          </p>
+          <div style={{ fontSize: '13px', color: '#92400E', fontWeight: 600 }}>
+            Get grandfathered-in pricing while it lasts
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {plans.map((plan, idx) => (
             <div

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { trackEvent } from '@/lib/analytics'
 
 interface TrialModalProps {
   isOpen: boolean
@@ -29,18 +30,7 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
     
     try {
       // Track the trial signup event
-      await fetch('/api/analytics', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          page: window.location.pathname,
-          event: 'trial_signup',
-          device: /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-          referrer: document.referrer || 'direct',
-        })
-      }).catch(() => {}) // Silent fail - don't block form submission
+      await trackEvent({ event: 'trial_signup' })
       
       const response = await fetch('/api/trial', {
         method: 'POST',

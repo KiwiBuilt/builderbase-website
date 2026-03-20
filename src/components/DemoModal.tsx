@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { trackEvent } from '@/lib/analytics'
 
 interface DemoModalProps {
   isOpen: boolean
@@ -20,18 +21,7 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     
     try {
       // Track the demo request event
-      await fetch('/api/analytics', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          page: window.location.pathname,
-          event: 'demo_request',
-          device: /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-          referrer: document.referrer || 'direct',
-        })
-      }).catch(() => {}) // Silent fail - don't block form submission
+      await trackEvent({ event: 'demo_request' })
       
       const response = await fetch('/api/demo', {
         method: 'POST',

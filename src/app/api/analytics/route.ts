@@ -5,7 +5,7 @@ import { doc, getDoc, updateDoc, setDoc, serverTimestamp, Timestamp } from 'fire
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { page, blogId, referrer, event, device, userAgent } = body
+    const { page, blogId, referrer, event, device, userAgent, sessionId } = body
 
     // Get today's date
     const today = new Date().toISOString().split('T')[0]
@@ -13,10 +13,18 @@ export async function POST(request: NextRequest) {
 
     // Get or create today's analytics record
     const analyticsSnap = await getDoc(analyticsRef)
-    let data = analyticsSnap.exists() ? analyticsSnap.data() : { visits: 0, pageViews: {}, events: {} }
+    let data = analyticsSnap.exists() ? analyticsSnap.data() : { visits: 0, pageViews: {}, events: {}, uniqueSessions: [] }
 
     // Increment total visits
     data.visits = (data.visits || 0) + 1
+
+    // Track unique sessions/visitors
+    if (sessionId) {
+      if (!data.uniqueSessions) data.uniqueSessions = []
+      if (!data.uniqueSessions.includes(sessionId)) {
+        data.uniqueSessions.push(sessionId)
+      }
+    }
 
     // Track page views
     if (!data.pageViews) data.pageViews = {}
@@ -75,8 +83,11 @@ export async function GET(request: NextRequest) {
       devices: {},
       referrers: {},
       blogViews: {},
+      uniqueVisitors: 0,
       dateRange: days,
     }
+
+    const allUniqueSessions = new Set<string>()
 
     // Fetch analytics for each day
     for (let i = 0; i < days; i++) {
@@ -91,6 +102,13 @@ export async function GET(request: NextRequest) {
         const dailyData = analyticsSnap.data()
         analyticsData.totalVisits += dailyData.visits || 0
         analyticsData.totalPageViews += Object.values(dailyData.pageViews || {}).reduce((a: any, b: any) => (a as number) + (b as number), 0)
+
+        // Aggregate unique sessions
+        if (dailyData.uniqueSessions && Array.isArray(dailyData.uniqueSessions)) {
+          dailyData.uniqueSessions.forEach((sessionId: string) => {
+            allUniqueSessions.add(sessionId)
+          })
+        }
 
         // Aggregate events
         if (dailyData.events) {
@@ -128,6 +146,9 @@ export async function GET(request: NextRequest) {
         }
       }
     }
+
+    // Set unique visitors count
+    analyticsData.uniqueVisitors = allUniqueSessions.size
 
     return NextResponse.json(analyticsData)
   } catch (error: any) {

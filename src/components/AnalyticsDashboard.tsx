@@ -18,9 +18,32 @@ export default function AnalyticsDashboard() {
       if (res.ok) {
         const data = await res.json()
         setAnalytics(data)
+      } else {
+        // Set default empty analytics
+        setAnalytics({
+          totalVisits: 0,
+          totalPageViews: 0,
+          totalEvents: { trial_signup: 0, demo_request: 0, login: 0 },
+          pageViews: {},
+          devices: { desktop: 0, mobile: 0, tablet: 0 },
+          referrers: {},
+          blogViews: {},
+          uniqueVisitors: 0,
+        })
       }
     } catch (error) {
       console.error('Error loading analytics:', error)
+      // Set default empty analytics on error
+      setAnalytics({
+        totalVisits: 0,
+        totalPageViews: 0,
+        totalEvents: { trial_signup: 0, demo_request: 0, login: 0 },
+        pageViews: {},
+        devices: { desktop: 0, mobile: 0, tablet: 0 },
+        referrers: {},
+        blogViews: {},
+        uniqueVisitors: 0,
+      })
     } finally {
       setLoading(false)
     }
@@ -30,14 +53,6 @@ export default function AnalyticsDashboard() {
     return (
       <div style={{ padding: '32px', textAlign: 'center' }}>
         <p style={{ color: '#6B7280' }}>Loading analytics...</p>
-      </div>
-    )
-  }
-
-  if (!analytics) {
-    return (
-      <div style={{ padding: '32px', textAlign: 'center' }}>
-        <p style={{ color: '#6B7280' }}>No analytics data available yet</p>
       </div>
     )
   }
@@ -120,6 +135,26 @@ export default function AnalyticsDashboard() {
           </div>
           <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '8px' }}>
             Unique sessions
+          </div>
+        </div>
+
+        {/* Unique Visitors */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '20px',
+          }}
+        >
+          <div style={{ fontSize: '12px', fontWeight: '600', color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase' }}>
+            🆕 NEW Visitors
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>
+            {(analytics.uniqueVisitors || 0).toLocaleString()}
+          </div>
+          <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '8px' }}>
+            First-time visitors
           </div>
         </div>
 

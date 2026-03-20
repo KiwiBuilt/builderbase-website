@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthSessionProvider } from '@/components/SessionProvider'
+import PageTracker from '@/components/PageTracker'
 
 export const metadata: Metadata = {
   title: 'BUILDER BASE - Construction Management Software for NZ Builders',
@@ -178,6 +179,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-white text-gray-900">
+        <PageTracker />
         <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>

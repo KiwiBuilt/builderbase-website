@@ -19,8 +19,12 @@ export default function SettingsPage() {
   const [savedMessage, setSavedMessage] = useState('')
 
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/admin/login')
-    else if (status === 'authenticated') loadSettings()
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      setLoading(false)
+      loadSettings()
+    }
   }, [status, router])
 
   const loadSettings = async () => {

@@ -63,14 +63,17 @@ export default function BlogEditorNew() {
   })
 
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/admin/login')
-    else if (status === 'authenticated' && blogId && blogId !== 'new') loadBlog()
-    else setLoading(false)
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      if (blogId && blogId !== 'new') {
+        loadBlog()
+      } else {
+        setLoading(false)
+      }
+      loadUploadedImages()
+    }
   }, [status, blogId, router])
-
-  useEffect(() => {
-    loadUploadedImages()
-  }, [])
 
   const loadBlog = async () => {
     try {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthSessionProvider } from '@/components/SessionProvider'
 
 export const metadata: Metadata = {
   title: 'BUILDER BASE - Construction Management Software for NZ Builders',
@@ -177,7 +178,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-white text-gray-900">
-        {children}
+        <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>
   )

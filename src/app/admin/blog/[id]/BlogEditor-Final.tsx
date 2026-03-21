@@ -83,30 +83,18 @@ export default function BlogEditorClean() {
     }
   }
 
-  const handleImageClick = (e: Event) => {
-    const img = e.target as HTMLImageElement
-    const alt = img.alt || ''
-    const width = img.style.width || img.width?.toString() || '100%'
-    const height = img.style.height || img.height?.toString() || 'auto'
-    setImageModal({ src: img.src, alt, description: alt, metaDesc: img.title || '', width, height })
-  }
-
   const handleImageContextMenu = (e: Event) => {
     e.preventDefault()
     const img = e.target as HTMLImageElement
     const alt = img.alt || ''
-    const width = img.style.width || img.width?.toString() || '100%'
-    const height = img.style.height || img.height?.toString() || 'auto'
-    setImageModal({ src: img.src, alt, description: alt, metaDesc: img.title || '', width, height })
+    setImageModal({ src: img.src, alt, description: alt, metaDesc: img.title || '', width: undefined, height: undefined })
   }
 
   const attachImageListeners = () => {
     setTimeout(() => {
       const images = document.querySelectorAll('.ProseMirror img') as NodeListOf<HTMLImageElement>
       images.forEach((img) => {
-        img.style.cursor = 'pointer'
-        img.removeEventListener('click', handleImageClick as EventListener)
-        img.addEventListener('click', handleImageClick as EventListener)
+        img.style.cursor = 'context-menu'
         img.removeEventListener('contextmenu', handleImageContextMenu as EventListener)
         img.addEventListener('contextmenu', handleImageContextMenu as EventListener)
       })
@@ -128,12 +116,7 @@ export default function BlogEditorClean() {
     },
   })
 
-  const resizeImage = (direction: 'up' | 'down') => {
-    if (!imageModal) return
-    const currentWidth = parseInt(imageModal.width || '100') || 100
-    const newWidth = direction === 'up' ? currentWidth + 10 : Math.max(30, currentWidth - 10)
-    setImageModal({ ...imageModal, width: newWidth.toString() })
-  }
+
 
   const applyImageChanges = () => {
     if (!imageModal) return
@@ -142,8 +125,6 @@ export default function BlogEditorClean() {
       if (img.src === imageModal.src) {
         img.alt = imageModal.description
         img.title = imageModal.metaDesc
-        img.style.width = imageModal.width || '100%'
-        img.style.height = imageModal.height || 'auto'
       }
     })
     setImageModal(null)
@@ -412,14 +393,15 @@ export default function BlogEditorClean() {
                 border-radius: 4px;
               }
               .ProseMirror img {
-                cursor: pointer;
+                cursor: context-menu;
                 border-radius: 4px;
                 transition: border 0.2s;
                 max-width: 100%;
                 height: auto;
               }
               .ProseMirror img:hover {
-                border: 2px solid #228AE6;
+                border: 2px solid #FFB400;
+                box-shadow: 0 0 8px rgba(255, 180, 0, 0.3);
               }
             `}</style>
             <EditorContent editor={editor} />
@@ -431,19 +413,10 @@ export default function BlogEditorClean() {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: '#FFF', borderRadius: '8px', padding: '24px', maxWidth: '500px', width: '90%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '600', marginTop: 0, marginBottom: '8px', color: '#111' }}>Edit Image</h2>
-            <small style={{ color: '#666', fontSize: '12px', display: 'block', marginBottom: '16px' }}>💡 Tip: Click or right-click images in the editor to edit them.</small>
+            <small style={{ color: '#666', fontSize: '12px', display: 'block', marginBottom: '16px' }}>💡 Right-click images in the editor to edit alt text and meta description.</small>
             
             <div style={{ marginBottom: '16px', textAlign: 'center' }}>
               <img src={imageModal.src} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '4px', border: '1px solid #D0D7DE' }} />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: '#222' }}>Width</label>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <input type="text" value={imageModal.width} onChange={(e) => setImageModal({ ...imageModal, width: e.target.value })} style={{ flex: 1, padding: '8px', border: '1px solid #D0D7DE', borderRadius: '4px', fontSize: '13px' }} />
-                <button onClick={() => resizeImage('up')} style={{ padding: '8px 12px', backgroundColor: '#F1F3F5', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>+</button>
-                <button onClick={() => resizeImage('down')} style={{ padding: '8px 12px', backgroundColor: '#F1F3F5', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>−</button>
-              </div>
             </div>
 
             <div style={{ marginBottom: '16px' }}>

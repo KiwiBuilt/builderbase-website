@@ -144,41 +144,60 @@ export default function BlogEditorClean() {
     if (!imageModal?.src) return
     setGeneratingImageDesc(true)
     try {
-      // Fetch image and convert to base64
-      const imageResponse = await fetch(imageModal.src)
-      const blob = await imageResponse.blob()
-      const reader = new FileReader()
-      
-      reader.onload = async () => {
-        const base64String = (reader.result as string).split(',')[1]
-        
+      // Convert image to base64 using canvas to avoid CORS issues
+      const img = document.createElement('img') as HTMLImageElement
+      img.crossOrigin = 'anonymous'
+      img.onload = async () => {
         try {
+          // Use canvas to convert image to base64
+          const canvas = document.createElement('canvas')
+          canvas.width = img.width
+          canvas.height = img.height
+          const ctx = canvas.getContext('2d')
+          if (!ctx) throw new Error('Cannot get canvas context')
+          ctx.drawImage(img, 0, 0)
+          const base64String = canvas.toDataURL('image/jpeg', 0.8).split(',')[1]
+          
+          console.log('Sending to API:', { type: 'image-vision', imageData: base64String?.slice(0, 50) + '...', imageType: 'image/jpeg' })
+          
           const response = await fetch('/api/generateContent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               type: 'image-vision',
               imageData: base64String,
-              imageType: blob.type || 'image/jpeg',
+              imageType: 'image/jpeg',
               customRules: 'Keep it under 160 characters. Focus on what the image shows and its relevance to construction/building.',
             }),
           })
-          if (response.ok) {
-            const data = await response.json()
-            const description = data.content?.replace(/<[^>]*>/g, '').slice(0, 160) || imageModal.alt
-            setImageModal({ ...imageModal, metaDesc: description })
+          
+          if (!response.ok) {
+            const errorData = await response.json()
+            console.error('API returned error:', errorData)
+            throw new Error(errorData.error || 'Failed to generate description')
           }
+          
+          const data = await response.json()
+          console.log('API response:', data)
+          const description = data.content?.replace(/<[^>]*>/g, '').slice(0, 160) || imageModal.alt
+          setImageModal({ ...imageModal, metaDesc: description })
         } catch (error) {
-          console.error('Error generating description:', error)
+          console.error('Error in image processing:', error)
+          alert('Failed to generate description: ' + (error instanceof Error ? error.message : 'Unknown error'))
         } finally {
           setGeneratingImageDesc(false)
         }
       }
-      
-      reader.readAsDataURL(blob)
+      img.onerror = () => {
+        console.error('Failed to load image:', imageModal.src)
+        setGeneratingImageDesc(false)
+        alert('Failed to load image. Check browser console for details.')
+      }
+      img.src = imageModal.src
     } catch (error) {
-      console.error('Error fetching image:', error)
+      console.error('Error setting up image:', error)
       setGeneratingImageDesc(false)
+      alert('Error: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
   }
 

@@ -96,6 +96,7 @@ export default function BlogEditorClean() {
       const images = document.querySelectorAll('.ProseMirror img') as NodeListOf<HTMLImageElement>
       images.forEach((img) => {
         img.style.cursor = 'context-menu'
+        img.setAttribute('crossOrigin', 'anonymous')
         img.removeEventListener('contextmenu', handleImageContextMenu as EventListener)
         img.addEventListener('contextmenu', handleImageContextMenu as EventListener)
       })

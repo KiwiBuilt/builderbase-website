@@ -88,11 +88,16 @@ export default function Features() {
           {features.map((feature, idx) => (
             <div
               key={idx}
-              className="group p-6 md:p-8 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300"
+              className="group relative p-6 md:p-8 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 cursor-help"
+              title={feature.description}
             >
               <div className="mb-6 group-hover:scale-110 transition-transform duration-300">{feature.icon}</div>
               <h3 className="text-lg md:text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
               <p className="text-gray-600 text-sm md:text-base leading-relaxed">{feature.description}</p>
+              {/* Tooltip on hover */}
+              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+                {feature.title}
+              </div>
             </div>
           ))}
         </div>

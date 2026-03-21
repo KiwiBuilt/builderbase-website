@@ -51,7 +51,7 @@ export function getPageDuration(): number {
 }
 
 /**
- * Track an analytics event
+ * Track an analytics event (excludes admin routes)
  */
 export async function trackEvent(eventData: {
   page?: string
@@ -60,13 +60,21 @@ export async function trackEvent(eventData: {
   timeOnPage?: number
 }) {
   try {
+    const currentPage = eventData.page || (typeof window !== 'undefined' ? window.location.pathname : '')
+    
+    // Don't track admin panel routes
+    if (currentPage.startsWith('/admin/')) {
+      console.log('📊 Skipping analytics for admin route:', currentPage)
+      return
+    }
+
     const payload = {
-      page: eventData.page || window.location.pathname,
+      page: currentPage,
       event: eventData.event,
       blogId: eventData.blogId,
       timeOnPage: eventData.timeOnPage || 0,
-      device: /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-      referrer: document.referrer || 'direct',
+      device: typeof navigator !== 'undefined' && /mobile|android|iphone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+      referrer: typeof document !== 'undefined' ? document.referrer || 'direct' : 'direct',
       sessionId: getSessionId(),
     }
     

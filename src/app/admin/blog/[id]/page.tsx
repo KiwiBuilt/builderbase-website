@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import BlogEditorClean from './BlogEditorClean'
+import BlogEditorClean from './BlogEditor-Final'
 
 export const dynamic = 'force-dynamic'
 

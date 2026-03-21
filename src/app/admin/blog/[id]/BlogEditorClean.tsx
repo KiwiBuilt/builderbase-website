@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -42,6 +42,9 @@ export default function BlogEditorClean() {
   const [topic, setTopic] = useState('')
   const [topicContext, setTopicContext] = useState('')
   const [aiMode, setAiMode] = useState<'content' | 'title' | 'complete'>('complete')
+  const [imageModal, setImageModal] = useState<{ src: string; alt: string; description: string; metaDesc: string; width?: string; height?: string } | null>(null)
+  const [generatingImageDesc, setGeneratingImageDesc] = useState(false)
+  const contextMenuRef = useRef<{ x: number; y: number; imageSrc: string } | null>(null)
 
   const editor = useEditor({
     extensions: [
@@ -56,8 +59,76 @@ export default function BlogEditorClean() {
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       setBlog((prev) => ({ ...prev, content: editor.getHTML() }))
+      // Add context menu listener to images
+      setTimeout(() => {
+        const images = document.querySelectorAll('.ProseMirror img') as NodeListOf<HTMLImageElement>
+        images.forEach((img) => {
+          img.addEventListener('contextmenu', handleImageContextMenu)
+        })
+      }, 100)
     },
   })
+
+  const handleImageContextMenu = (e: Event) => {
+    e.preventDefault()
+    const img = e.target as HTMLImageElement
+    contextMenuRef.current = { x: (e as MouseEvent).clientX, y: (e as MouseEvent).clientY, imageSrc: img.src }
+    
+    // Get image attributes from editor
+    const alt = img.alt || ''
+    const width = img.style.width || img.width?.toString() || '100%'
+    const height = img.style.height || img.height?.toString() || 'auto'
+    
+    setImageModal({ src: img.src, alt, description: alt, metaDesc: img.title || '', width, height })
+  }
+
+  const resizeImage = (direction: 'up' | 'down') => {
+    if (!imageModal) return
+    const currentWidth = parseInt(imageModal.width || '100') || 100
+    const newWidth = direction === 'up' ? currentWidth + 10 : Math.max(30, currentWidth - 10)
+    setImageModal({ ...imageModal, width: newWidth.toString() })
+  }
+
+  const applyImageChanges = () => {
+    if (!imageModal) return
+    const images = document.querySelectorAll('.ProseMirror img') as NodeListOf<HTMLImageElement>
+    images.forEach((img) => {
+      if (img.src === imageModal.src) {
+        img.alt = imageModal.description
+        img.title = imageModal.metaDesc
+        img.style.width = imageModal.width || '100%'
+        img.style.height = imageModal.height || 'auto'
+      }
+    })
+    setImageModal(null)
+  }
+
+  const generateImageDescription = async () => {
+    if (!imageModal?.src) return
+    setGeneratingImageDesc(true)
+    try {
+      const response = await fetch('/api/generateContent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'content',
+          topic: `Generate a concise image description for this image URL in 1-2 sentences: ${imageModal.src}`,
+          topicContext: 'This is for a construction/builder website blog post. Be technical but accessible.',
+          customRules: 'Keep it under 160 characters. Focus on what the image shows and its relevance to construction/building.',
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const description = data.content?.replace(/<[^>]*>/g, '').slice(0, 160) || imageModal.alt
+        setImageModal({ ...imageModal, metaDesc: description })
+      }
+    } catch (error) {
+      console.error('Error generating description:', error)
+    } finally {
+      setGeneratingImageDesc(false)
+    }
+  }
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/admin/login')
@@ -299,11 +370,81 @@ export default function BlogEditorClean() {
             <button onClick={() => document.getElementById('file-input')?.click()} style={{ padding: '5px 9px', fontSize: '13px', backgroundColor: '#FFF', border: '1px solid #D0D7DE', borderRadius: '3px', cursor: 'pointer' }}>🖼️ Image</button>
           </div>
 
-          {/* Editor content - LARGE AND CLEAN */}
+          {/* Editor content - LARGE AREA WITH VISIBLE CURSOR */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '40px 60px', fontSize: '16px', lineHeight: '1.8', color: '#222' }}>
+            <style>{`
+              .ProseMirror {
+                min-height: 500px;
+                outline: none;
+                caret-color: #228AE6;
+              }
+              .ProseMirror:focus {
+                outline: 2px solid #228AE6;
+                outline-offset: -2px;
+                border-radius: 4px;
+              }
+              .ProseMirror img {
+                cursor: pointer;
+                border-radius: 4px;
+                transition: border 0.2s;
+                max-width: 100%;
+                height: auto;
+              }
+              .ProseMirror img:hover {
+                border: 2px solid #228AE6;
+              }
+            `}</style>
             <EditorContent editor={editor} />
           </div>
         </div>
+
+        {/* IMAGE MODAL */}
+        {imageModal && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ backgroundColor: '#FFF', borderRadius: '8px', padding: '24px', maxWidth: '500px', width: '90%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', marginTop: 0, marginBottom: '16px', color: '#111' }}>Edit Image</h2>
+              
+              {/* Image preview */}
+              <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+                <img src={imageModal.src} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '4px', border: '1px solid #D0D7DE' }} />
+              </div>
+
+              {/* Size controls */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: '#222' }}>Width</label>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input type="text" value={imageModal.width} onChange={(e) => setImageModal({ ...imageModal, width: e.target.value })} style={{ flex: 1, padding: '8px', border: '1px solid #D0D7DE', borderRadius: '4px', fontSize: '13px' }} />
+                  <button onClick={() => resizeImage('up')} style={{ padding: '8px 12px', backgroundColor: '#F1F3F5', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>+</button>
+                  <button onClick={() => resizeImage('down')} style={{ padding: '8px 12px', backgroundColor: '#F1F3F5', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>−</button>
+                </div>
+              </div>
+
+              {/* Alt text */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: '#222' }}>Alt Text (for accessibility)</label>
+                <textarea value={imageModal.description} onChange={(e) => setImageModal({ ...imageModal, description: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #D0D7DE', borderRadius: '4px', minHeight: '60px', fontSize: '13px', boxSizing: 'border-box' }} />
+              </div>
+
+              {/* Meta description */}
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#222' }}>Meta Description (SEO)</label>
+                  <button onClick={generateImageDescription} disabled={generatingImageDesc} style={{ padding: '4px 12px', backgroundColor: '#228AE6', color: '#FFF', border: 'none', borderRadius: '3px', cursor: 'pointer', fontSize: '11px', fontWeight: '600' }}>
+                    {generatingImageDesc ? '⏳ AI...' : '✨ AI'}
+                  </button>
+                </div>
+                <textarea value={imageModal.metaDesc} onChange={(e) => setImageModal({ ...imageModal, metaDesc: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #D0D7DE', borderRadius: '4px', minHeight: '60px', fontSize: '13px', boxSizing: 'border-box' }} maxLength={160} />
+                <small style={{ color: '#999', fontSize: '11px' }}>{imageModal.metaDesc.length}/160</small>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button onClick={() => setImageModal(null)} style={{ padding: '10px 16px', backgroundColor: '#F1F3F5', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '13px' }}>Cancel</button>
+                <button onClick={applyImageChanges} style={{ padding: '10px 16px', backgroundColor: '#228AE6', color: '#FFF', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '13px' }}>Save</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* FILE INPUT */}

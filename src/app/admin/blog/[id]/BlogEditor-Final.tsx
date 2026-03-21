@@ -359,7 +359,7 @@ export default function BlogEditorClean() {
                 min-height: 500px;
                 outline: none;
                 caret-color: #228AE6;
-                padding-right: 20px;
+                padding: 15px 20px;
               }
               .ProseMirror:focus {
                 outline: 2px solid #228AE6;

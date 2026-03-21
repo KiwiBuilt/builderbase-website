@@ -8,7 +8,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { ref, uploadBytes, getDownloadURL, listAll, deleteObject } from 'firebase/storage'
 import { storage } from '@/lib/firebase'
 
 export const dynamic = 'force-dynamic'
@@ -44,6 +44,29 @@ export default function BlogEditorClean() {
   const [aiMode, setAiMode] = useState<'content' | 'title' | 'complete'>('complete')
   const [imageModal, setImageModal] = useState<{ src: string; alt: string; description: string; metaDesc: string; width?: string; height?: string } | null>(null)
   const [generatingImageDesc, setGeneratingImageDesc] = useState(false)
+  const [galleryImages, setGalleryImages] = useState<{ url: string; name: string }[]>([])
+  const [showGallerySelector, setShowGallerySelector] = useState(false)
+  const [galleryLoading, setGalleryLoading] = useState(false)
+  const [gallerySearch, setGallerySearch] = useState('')
+
+  const loadGalleryImages = async () => {
+    setGalleryLoading(true)
+    try {
+      const imagesRef = ref(storage, 'blog-images')
+      const result = await listAll(imagesRef)
+      const imageList = await Promise.all(
+        result.items.map(async (item) => ({
+          url: await getDownloadURL(item),
+          name: item.name,
+        }))
+      )
+      setGalleryImages(imageList.sort((a, b) => b.name.localeCompare(a.name)))
+    } catch (error) {
+      console.error('Error loading gallery images:', error)
+    } finally {
+      setGalleryLoading(false)
+    }
+  }
 
   const loadBlog = async () => {
     try {
@@ -163,17 +186,27 @@ export default function BlogEditorClean() {
     }
     setUploading(true)
     try {
-      const filename = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      const fileRef = ref(storage, `blog-images/${filename}`)
+      const timestamp = Date.now()
+      const randomId = Math.random().toString(36).substring(7)
+      const fileName = `${timestamp}-${randomId}-${file.name}`
+      const fileRef = ref(storage, `blog-images/${fileName}`)
       await uploadBytes(fileRef, file)
       const url = await getDownloadURL(fileRef)
       editor?.chain().focus().setImage({ src: url }).run()
+      // Refresh gallery list
+      await loadGalleryImages()
+      alert('✅ Image uploaded to gallery and added to blog!')
     } catch (error) {
       console.error('Error uploading image:', error)
       alert('Error uploading image')
     } finally {
       setUploading(false)
     }
+  }
+
+  const addImageFromGallery = (imageUrl: string) => {
+    editor?.chain().focus().setImage({ src: imageUrl }).run()
+    setShowGallerySelector(false)
   }
 
   const handleTitleChange = (e: string) => {
@@ -305,7 +338,7 @@ export default function BlogEditorClean() {
               <button onClick={() => editor?.chain().focus().toggleItalic().run()} style={{ padding: '10px 8px', backgroundColor: '#F6F8FA', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}><em>I</em></button>
               <button onClick={() => editor?.chain().focus().toggleBulletList().run()} style={{ padding: '10px 8px', backgroundColor: '#F6F8FA', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>●●●</button>
               <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} style={{ padding: '10px 8px', backgroundColor: '#F6F8FA', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>1.2.</button>
-              <button onClick={() => document.getElementById('file-input')?.click()} style={{ padding: '10px 8px', backgroundColor: '#F6F8FA', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>🖼️</button>
+              <button onClick={() => { setShowGallerySelector(true); loadGalleryImages(); }} style={{ padding: '10px 8px', backgroundColor: '#FFF8DC', border: '1px solid #FFD700', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}>🖼️ Gallery</button>
               <button onClick={() => editor?.chain().focus().toggleBlockquote().run()} style={{ padding: '10px 8px', backgroundColor: '#F6F8FA', border: '1px solid #D0D7DE', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>❝❞</button>
             </div>
           </div>
@@ -350,7 +383,7 @@ export default function BlogEditorClean() {
             <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} style={{ padding: '5px 9px', fontSize: '11px', fontWeight: 'bold', backgroundColor: editor?.isActive('heading') ? '#E8F0FE' : '#FFF', border: '1px solid #D0D7DE', borderRadius: '3px', cursor: 'pointer' }}>H</button>
             <button onClick={() => editor?.chain().focus().toggleBulletList().run()} style={{ padding: '5px 9px', fontSize: '13px', backgroundColor: editor?.isActive('bulletList') ? '#E8F0FE' : '#FFF', border: '1px solid #D0D7DE', borderRadius: '3px', cursor: 'pointer' }}>●</button>
             <div style={{ width: '1px', backgroundColor: '#D0D7DE', height: '18px' }} />
-            <button onClick={() => document.getElementById('file-input')?.click()} style={{ padding: '5px 9px', fontSize: '13px', backgroundColor: '#FFF', border: '1px solid #D0D7DE', borderRadius: '3px', cursor: 'pointer' }}>🖼️ Image</button>
+            <button onClick={() => { setShowGallerySelector(true); loadGalleryImages(); }} style={{ padding: '5px 9px', fontSize: '13px', backgroundColor: '#FFF8DC', border: '1px solid #FFD700', borderRadius: '3px', cursor: 'pointer', fontWeight: '600' }}>🖼️ Gallery</button>
           </div>
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '30px 35px', fontSize: '16px', lineHeight: '1.8', color: '#222' }}>
@@ -426,6 +459,42 @@ export default function BlogEditorClean() {
       )}
 
       <input id="file-input" type="file" accept="image/*" hidden onChange={(e) => { const file = e.target.files?.[0]; if (file) handleImageUpload(file) }} />
+
+      {showGallerySelector && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div style={{ backgroundColor: '#FFF', borderRadius: '8px', padding: '24px', maxWidth: '800px', width: '90%', maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0, color: '#111' }}>Select or Upload Image</h2>
+              <button onClick={() => setShowGallerySelector(false)} style={{ fontSize: '24px', background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}>×</button>
+            </div>
+            
+            <input type="text" value={gallerySearch} onChange={(e) => setGallerySearch(e.target.value)} placeholder="Search gallery..." style={{ width: '100%', padding: '10px', marginBottom: '12px', border: '1px solid #D0D7DE', borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box' }} />
+            
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <button onClick={() => document.getElementById('gallery-file-input')?.click()} disabled={uploading} style={{ flex: 1, padding: '10px', backgroundColor: '#228AE6', color: '#FFF', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '13px' }}>
+                {uploading ? '⏳ Uploading...' : '➕ Upload New Image'}
+              </button>
+            </div>
+            
+            <div style={{ flex: 1, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px', paddingRight: '8px' }}>
+              {galleryLoading ? (
+                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px', color: '#666' }}>Loading gallery...</div>
+              ) : galleryImages.filter((img) => img.name.toLowerCase().includes(gallerySearch.toLowerCase())).length === 0 ? (
+                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px', color: '#666' }}>No images found. Upload one to get started!</div>
+              ) : (
+                galleryImages.filter((img) => img.name.toLowerCase().includes(gallerySearch.toLowerCase())).map((img) => (
+                  <div key={img.name} onClick={() => addImageFromGallery(img.url)} style={{ position: 'relative', cursor: 'pointer', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#F6F8FA', border: '2px solid transparent', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#228AE6'; e.currentTarget.style.backgroundColor = '#E8F0FE'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.backgroundColor = '#F6F8FA'; }}>
+                    <img src={img.url} alt={img.name} style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(34, 138, 230, 0.8)', opacity: 0, transition: 'opacity 0.2s', color: '#FFF', fontSize: '12px', fontWeight: '600' }} onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }} onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; }}>Click to add</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <input id="gallery-file-input" type="file" accept="image/*" hidden onChange={(e) => { const file = e.target.files?.[0]; if (file) handleImageUpload(file) }} />
     </div>
   )
 }

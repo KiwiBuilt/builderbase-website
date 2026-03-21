@@ -44,7 +44,6 @@ export default function BlogEditorClean() {
   const [aiMode, setAiMode] = useState<'content' | 'title' | 'complete'>('complete')
   const [imageModal, setImageModal] = useState<{ src: string; alt: string; description: string; metaDesc: string; width?: string; height?: string } | null>(null)
   const [generatingImageDesc, setGeneratingImageDesc] = useState(false)
-  const contextMenuRef = useRef<{ x: number; y: number; imageSrc: string } | null>(null)
 
   const editor = useEditor({
     extensions: [
@@ -72,7 +71,6 @@ export default function BlogEditorClean() {
   const handleImageContextMenu = (e: Event) => {
     e.preventDefault()
     const img = e.target as HTMLImageElement
-    contextMenuRef.current = { x: (e as MouseEvent).clientX, y: (e as MouseEvent).clientY, imageSrc: img.src }
     
     // Get image attributes from editor
     const alt = img.alt || ''
@@ -371,12 +369,13 @@ export default function BlogEditorClean() {
           </div>
 
           {/* Editor content - LARGE AREA WITH VISIBLE CURSOR */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '40px 60px', fontSize: '16px', lineHeight: '1.8', color: '#222' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '30px 35px', fontSize: '16px', lineHeight: '1.8', color: '#222' }}>
             <style>{`
               .ProseMirror {
                 min-height: 500px;
                 outline: none;
                 caret-color: #228AE6;
+                padding-right: 20px;
               }
               .ProseMirror:focus {
                 outline: 2px solid #228AE6;

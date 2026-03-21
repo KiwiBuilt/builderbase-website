@@ -87,7 +87,8 @@ export default function BlogEditorClean() {
     e.preventDefault()
     const img = e.target as HTMLImageElement
     const alt = img.alt || ''
-    setImageModal({ src: img.src, alt, description: alt, metaDesc: img.title || '', width: undefined, height: undefined })
+    const width = img.style.width ? parseInt(img.style.width) : 400
+    setImageModal({ src: img.src, alt, description: alt, metaDesc: img.title || '', width: width.toString(), height: undefined })
   }
 
   const attachImageListeners = () => {
@@ -116,7 +117,12 @@ export default function BlogEditorClean() {
     },
   })
 
-
+  const resizeImage = (direction: 'up' | 'down') => {
+    if (!imageModal) return
+    const currentWidth = parseInt(imageModal.width || '400') || 400
+    const newWidth = direction === 'up' ? currentWidth + 50 : Math.max(100, currentWidth - 50)
+    setImageModal({ ...imageModal, width: newWidth.toString() })
+  }
 
   const applyImageChanges = () => {
     if (!imageModal) return
@@ -125,6 +131,10 @@ export default function BlogEditorClean() {
       if (img.src === imageModal.src) {
         img.alt = imageModal.description
         img.title = imageModal.metaDesc
+        if (imageModal.width) {
+          img.style.width = imageModal.width + 'px'
+          img.style.height = 'auto'
+        }
       }
     })
     setImageModal(null)
@@ -413,10 +423,21 @@ export default function BlogEditorClean() {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: '#FFF', borderRadius: '8px', padding: '24px', maxWidth: '500px', width: '90%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '600', marginTop: 0, marginBottom: '8px', color: '#111' }}>Edit Image</h2>
-            <small style={{ color: '#666', fontSize: '12px', display: 'block', marginBottom: '16px' }}>💡 Right-click images in the editor to edit alt text and meta description.</small>
+            <small style={{ color: '#666', fontSize: '12px', display: 'block', marginBottom: '16px' }}>💡 Adjust width with up/down arrows. Edit alt text for accessibility.</small>
             
             <div style={{ marginBottom: '16px', textAlign: 'center' }}>
               <img src={imageModal.src} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '4px', border: '1px solid #D0D7DE' }} />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: '#222' }}>Image Width</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input type="text" value={imageModal.width || '400'} onChange={(e) => setImageModal({ ...imageModal, width: e.target.value })} placeholder="400" style={{ flex: 1, padding: '8px', border: '1px solid #D0D7DE', borderRadius: '4px', fontSize: '13px' }} />
+                <span style={{ fontSize: '12px', color: '#666' }}>px</span>
+                <button onClick={() => resizeImage('up')} style={{ padding: '8px 12px', backgroundColor: '#228AE6', color: '#FFF', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', minWidth: '40px' }}>▲</button>
+                <button onClick={() => resizeImage('down')} style={{ padding: '8px 12px', backgroundColor: '#228AE6', color: '#FFF', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', minWidth: '40px' }}>▼</button>
+              </div>
+              <small style={{ color: '#999', fontSize: '11px', display: 'block', marginTop: '4px' }}>Use arrows or type a pixel value (100-1000)</small>
             </div>
 
             <div style={{ marginBottom: '16px' }}>

@@ -209,6 +209,18 @@ export default function BlogEditorClean() {
     setShowGallerySelector(false)
   }
 
+  const deleteImageFromGallery = async (imageName: string) => {
+    if (!confirm(`Delete this image from the gallery?`)) return
+    try {
+      const imageRef = ref(storage, `blog-images/${imageName}`)
+      await deleteObject(imageRef)
+      setGalleryImages((prev) => prev.filter((img) => img.name !== imageName))
+    } catch (error) {
+      console.error('Error deleting image:', error)
+      alert('Error deleting image')
+    }
+  }
+
   const handleTitleChange = (e: string) => {
     setBlog((prev) => ({
       ...prev,
@@ -483,9 +495,10 @@ export default function BlogEditorClean() {
                 <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px', color: '#666' }}>No images found. Upload one to get started!</div>
               ) : (
                 galleryImages.filter((img) => img.name.toLowerCase().includes(gallerySearch.toLowerCase())).map((img) => (
-                  <div key={img.name} onClick={() => addImageFromGallery(img.url)} style={{ position: 'relative', cursor: 'pointer', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#F6F8FA', border: '2px solid transparent', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#228AE6'; e.currentTarget.style.backgroundColor = '#E8F0FE'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.backgroundColor = '#F6F8FA'; }}>
-                    <img src={img.url} alt={img.name} style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(34, 138, 230, 0.8)', opacity: 0, transition: 'opacity 0.2s', color: '#FFF', fontSize: '12px', fontWeight: '600' }} onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }} onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; }}>Click to add</div>
+                  <div key={img.name} style={{ position: 'relative', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#F6F8FA', border: '2px solid transparent', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#228AE6'; e.currentTarget.style.backgroundColor = '#E8F0FE'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.backgroundColor = '#F6F8FA'; }}>
+                    <img src={img.url} alt={img.name} onClick={() => addImageFromGallery(img.url)} style={{ width: '100%', height: '120px', objectFit: 'cover', cursor: 'pointer' }} />
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(34, 138, 230, 0.8)', opacity: 0, transition: 'opacity 0.2s', color: '#FFF', fontSize: '12px', fontWeight: '600' }} onClick={() => addImageFromGallery(img.url)} onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }} onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; }}>Click to add</div>
+                    <button onClick={(e) => { e.stopPropagation(); deleteImageFromGallery(img.name); }} style={{ position: 'absolute', top: '4px', right: '4px', width: '28px', height: '28px', padding: '0', backgroundColor: '#FF4444', color: '#FFF', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }} title="Delete image">🗑️</button>
                   </div>
                 ))
               )}

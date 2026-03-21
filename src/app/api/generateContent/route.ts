@@ -6,11 +6,93 @@ export async function POST(request: NextRequest) {
   try {
     const { 
       prompt, 
-      type = 'content', // 'content', 'title', 'complete' (all fields)
+      type = 'content', // 'content', 'title', 'complete', 'image-vision'
       customRules = '', // Custom instructions to always follow
       topicContext = '', // Background info about the topic
       category = 'General',
+      imageData = '', // Base64 encoded image data
+      imageType = 'image/jpeg', // MIME type of image
     } = await request.json()
+
+    // Handle image vision requests
+    if (type === 'image-vision' && imageData) {
+      const apiKey = process.env.GEMINI_API_KEY
+      if (!apiKey) {
+        return NextResponse.json(
+          { error: 'AI service is not configured' },
+          { status: 500 }
+        )
+      }
+
+      const visionPrompt = `You are analyzing a construction/builder industry image for a blog website. Analyze this image and provide a concise meta description for SEO purposes (max 160 characters).
+
+The description should:
+- Clearly describe what's in the image
+- Be relevant to construction, building, or site management
+- Be suitable for search engines
+- Focus on the practical/professional aspects
+
+${customRules ? `Additional instructions: ${customRules}` : ''}
+
+Return ONLY a JSON object:
+{
+  "content": "Your meta description here (under 160 chars)"
+}`
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: visionPrompt,
+                  },
+                  {
+                    inlineData: {
+                      mimeType: imageType,
+                      data: imageData,
+                    },
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              maxOutputTokens: 200,
+              temperature: 0.7,
+            },
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('Gemini Vision API error:', error)
+        return NextResponse.json(
+          { error: 'Failed to analyze image' },
+          { status: 500 }
+        )
+      }
+
+      const visionData = await response.json()
+      try {
+        const text = visionData.candidates?.[0]?.content?.parts?.[0]?.text || ''
+        const jsonMatch = text.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0])
+          return NextResponse.json({ content: parsed.content || text.slice(0, 160) })
+        }
+        return NextResponse.json({ content: text.slice(0, 160) })
+      } catch (parseError) {
+        const text = visionData.candidates?.[0]?.content?.parts?.[0]?.text || ''
+        return NextResponse.json({ content: text.slice(0, 160) })
+      }
+    }
 
     if (!prompt || prompt.trim().length === 0) {
       return NextResponse.json(

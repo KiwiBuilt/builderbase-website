@@ -144,24 +144,40 @@ export default function BlogEditorClean() {
     if (!imageModal?.src) return
     setGeneratingImageDesc(true)
     try {
-      const response = await fetch('/api/generateContent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'content',
-          topic: `Generate a concise image description for this image URL in 1-2 sentences: ${imageModal.src}`,
-          topicContext: 'This is for a construction/builder website blog post. Be technical but accessible.',
-          customRules: 'Keep it under 160 characters. Focus on what the image shows and its relevance to construction/building.',
-        }),
-      })
-      if (response.ok) {
-        const data = await response.json()
-        const description = data.content?.replace(/<[^>]*>/g, '').slice(0, 160) || imageModal.alt
-        setImageModal({ ...imageModal, metaDesc: description })
+      // Fetch image and convert to base64
+      const imageResponse = await fetch(imageModal.src)
+      const blob = await imageResponse.blob()
+      const reader = new FileReader()
+      
+      reader.onload = async () => {
+        const base64String = (reader.result as string).split(',')[1]
+        
+        try {
+          const response = await fetch('/api/generateContent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'image-vision',
+              imageData: base64String,
+              imageType: blob.type || 'image/jpeg',
+              customRules: 'Keep it under 160 characters. Focus on what the image shows and its relevance to construction/building.',
+            }),
+          })
+          if (response.ok) {
+            const data = await response.json()
+            const description = data.content?.replace(/<[^>]*>/g, '').slice(0, 160) || imageModal.alt
+            setImageModal({ ...imageModal, metaDesc: description })
+          }
+        } catch (error) {
+          console.error('Error generating description:', error)
+        } finally {
+          setGeneratingImageDesc(false)
+        }
       }
+      
+      reader.readAsDataURL(blob)
     } catch (error) {
-      console.error('Error generating description:', error)
-    } finally {
+      console.error('Error fetching image:', error)
       setGeneratingImageDesc(false)
     }
   }

@@ -217,6 +217,148 @@ export default function SettingsPage() {
             </ul>
           </div>
         </div>
+
+        {/* Ahrefs Analytics Section */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            padding: '32px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            marginTop: '24px',
+          }}
+        >
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
+            📊 Ahrefs Analytics
+          </h2>
+          <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '24px' }}>
+            Installation guide for Ahrefs analytics tracking on your website.
+          </p>
+
+          <div style={{ marginBottom: '32px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1F2937', marginBottom: '12px' }}>
+              Installation Guide
+            </h3>
+            <p style={{ fontSize: '14px', color: '#4B5563', lineHeight: '1.6', marginBottom: '16px' }}>
+              Copy the snippet below and paste it into the <code>&lt;head&gt;</code> section of your site. Once done, click the "Recheck installation" button to verify your installation.
+            </p>
+
+            <div style={{ marginBottom: '16px' }}>
+              <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '8px' }}>
+                <strong>Data Key:</strong>
+              </p>
+              <div
+                style={{
+                  padding: '12px',
+                  backgroundColor: '#F3F4F6',
+                  borderRadius: '6px',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  color: '#374151',
+                  borderLeft: '3px solid #EAB308',
+                  wordBreak: 'break-all',
+                }}
+              >
+                ZZ+5iN0rEPiDTyiEyduY+g
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '8px' }}>
+                <strong>Script to Install:</strong>
+              </p>
+              <div
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#1F2937',
+                  borderRadius: '6px',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  color: '#E5E7EB',
+                  overflow: 'auto',
+                  borderLeft: '3px solid #EAB308',
+                }}
+              >
+                <pre style={{ margin: 0 }}>
+{`<script src="https://analytics.ahrefs.com/analytics.js" data-key="ZZ+5iN0rEPiDTyiEyduY+g" async></script>`}
+                </pre>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                const scriptText = `<script src="https://analytics.ahrefs.com/analytics.js" data-key="ZZ+5iN0rEPiDTyiEyduY+g" async></script>`
+                navigator.clipboard.writeText(scriptText)
+                alert('✅ Script copied to clipboard!')
+              }}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#EAB308',
+                color: '#111827',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '14px',
+                marginBottom: '24px',
+              }}
+            >
+              📋 Copy Script
+            </button>
+
+            <div style={{ marginBottom: '24px' }}>
+              <a
+                href="https://ahrefs.com/analytics"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  padding: '10px 16px',
+                  backgroundColor: '#F3F4F6',
+                  color: '#0369A1',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                🔗 Recheck Installation
+              </a>
+            </div>
+          </div>
+
+          {/* Alternative Installation Method */}
+          <div style={{ paddingTop: '24px', borderTop: '1px solid #E5E7EB' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1F2937', marginBottom: '12px' }}>
+              Install with Google Tag Manager
+            </h3>
+            <p style={{ fontSize: '14px', color: '#4B5563', lineHeight: '1.6', marginBottom: '16px' }}>
+              If you're using Google Tag Manager, follow these steps:
+            </p>
+            <ol style={{ fontSize: '14px', color: '#4B5563', lineHeight: '1.8', paddingLeft: '20px' }}>
+              <li>Log in to your Google Tag Manager account</li>
+              <li>Click <strong>New Tag</strong> and select <strong>Custom HTML</strong></li>
+              <li>Paste the script snippet above into the HTML field</li>
+              <li>Set the trigger to fire on <strong>All Pages</strong></li>
+              <li>Click <strong>Save</strong> and publish your container</li>
+            </ol>
+          </div>
+
+          {/* Info Box */}
+          <div style={{ padding: '16px', backgroundColor: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '6px', marginTop: '24px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#15803D' }}>
+              ℹ️ About Ahrefs Analytics
+            </h3>
+            <ul style={{ fontSize: '13px', color: '#166534', lineHeight: '1.6', paddingLeft: '20px', margin: 0 }}>
+              <li>Tracks visitor behavior and engagement on your website</li>
+              <li>Provides insights into traffic sources and user flow</li>
+              <li>Complements your existing analytics setup</li>
+              <li>Data key must be included for tracking to work correctly</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   )

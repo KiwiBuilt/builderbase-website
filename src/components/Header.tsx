@@ -40,7 +40,7 @@ export default function Header() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="https://app.kiwi-built.nz" className="btn-secondary text-sm">
+            <a href="https://app.builderbase.co.nz" className="btn-secondary text-sm">
               Sign In
             </a>
             <button onClick={() => setModalOpen(true)} className="btn-primary text-sm">

@@ -177,6 +177,13 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* Ahrefs Analytics */}
+        <script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="ZZ+5iN0rEPiDTyiEyduY+g"
+          async
+        ></script>
       </head>
       <body className="bg-white text-gray-900">
         <PageTracker />

@@ -79,8 +79,8 @@ export default function Footer() {
             <div>
               <h4 className="text-white font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="https://app.kiwi-built.nz/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-500 transition-colors">Privacy Policy</a></li>
-                <li><a href="https://app.kiwi-built.nz/terms" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-500 transition-colors">Terms of Service</a></li>
+                <li><a href="https://app.builderbase.co.nz/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-500 transition-colors">Privacy Policy</a></li>
+                <li><a href="https://app.builderbase.co.nz/terms" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-500 transition-colors">Terms of Service</a></li>
                 <li><a href="mailto:office@builderbase.co.nz" className="hover:text-yellow-500 transition-colors">Contact</a></li>
               </ul>
             </div>

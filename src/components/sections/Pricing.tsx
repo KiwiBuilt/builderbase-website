@@ -113,7 +113,7 @@ export default function Pricing() {
         'Process Checklists',
       ],
       cta: 'Coming Soon',
-      highlighted: false,
+      highlighted: true,
       comingSoon: true,
     },
   ]
@@ -298,7 +298,7 @@ export default function Pricing() {
               },
               {
                 q: 'Do my clients automatically get portal access?',
-                a: 'No setup needed. When you invite them, they get instant access—no extra steps or costs.',
+                a: 'It\'s optional and up to you. When you choose to invite them, they get instant access—no extra steps or costs.',
               },
               {
                 q: 'Can I integrate with Xero?',

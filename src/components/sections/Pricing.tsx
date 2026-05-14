@@ -15,59 +15,106 @@ export default function Pricing() {
 
   const plans = [
     {
-      name: 'Essential Builder',
+      name: 'Essential',
       badge: 'Founding Member',
       price: '$69',
       period: '/month',
-      description: 'Solo builders (1-3 people) with unlimited projects',
+      annualPrice: '$750',
+      annualSavings: 'Save 9% annually',
+      description: 'Core job costing tools - Site Diaries, Change Orders, Timesheets & Invoicing',
+      limits: {
+        users: 3,
+        activeProjects: 10,
+      },
       features: [
-        '3 Team Members (Hard Cap)',
-        'Unlimited projects & storage',
-        'Mobile app (time clock, site diary, photos)',
-        'Job costing & estimates',
-        'Invoicing & quotes',
-        'Basic scheduling (list view)',
-        'Xero sync ($10/month addon)',
-        'Email support',
+        'Jobs',
+        'Tasks',
+        'Files',
+        'Financials',
+        'Client Portal',
+        'Invoicing',
+        'Compliance',
+        'Time Clock',
       ],
       cta: 'Start Free Trial',
       highlighted: false,
     },
     {
-      name: 'Basic Builder',
-      badge: 'Founding Member',
-      price: '$199',
+      name: 'Basic',
+      badge: 'COMING SOON',
+      price: '$149',
       period: '/month',
-      description: 'Small crews (1-5 people) who need mobile time tracking',
+      annualPrice: '$1490',
+      annualSavings: 'Save 17% annually',
+      description: 'Essential features for small teams and independent contractors',
+      limits: {
+        users: 5,
+        activeProjects: 10,
+      },
       features: [
-        '5 Team Members',
-        'Unlimited projects & storage',
-        'Full mobile app (time clock, site diary, photos, tasks)',
-        'Jobs, estimates, invoicing',
-        'Client portal',
-        'Xero integration',
+        'Jobs',
+        'Tasks',
+        'Files',
+        'Financials',
+        'Client Portal',
+        'Invoicing',
+        'Basic Reporting',
+        'Web Analytics',
+        'Lead Forms',
+        'Compliance',
+        'Messaging',
+        'Sales Pipeline',
+        'Task Management',
       ],
-      cta: 'Start Free Trial',
+      cta: 'Coming Soon',
       highlighted: true,
+      comingSoon: true,
     },
     {
       name: 'Professional',
-      badge: 'Founding Member',
-      price: '$399',
+      badge: 'COMING SOON',
+      price: '$349',
       period: '/month',
-      description: 'Growing businesses (5-15 staff) needing team management',
+      annualPrice: '$3490',
+      annualSavings: 'Save 17% annually',
+      description: 'Full-featured platform for growing construction teams',
+      limits: {
+        users: 25,
+        activeProjects: 50,
+      },
       features: [
-        '15 Team Members',
-        'Unlimited projects & storage',
-        'Everything in Basic +',
-        'Staff management portal',
-        'Leave management',
-        'Purchase requests & approvals',
-        'Certificate tracking (licenses, safety tickets)',
-        'Issues tracking',
+        'Jobs',
+        'Tasks',
+        'Files',
+        'Financials',
+        'Client Portal',
+        'Invoicing',
+        'Basic Reporting',
+        'Web Analytics',
+        'Lead Forms',
+        'Compliance',
+        'Messaging',
+        'Sales Pipeline',
+        'Staff Management',
+        'Home Portal',
+        'Leave Management',
+        'Purchase Requests',
+        'Certificate Tracking',
+        'Vehicle Management',
+        'Time Clock',
+        'Advanced Reporting',
+        'Job Map',
+        'Past Jobs',
+        'Job Schedule',
+        'Selections',
+        'Toolbox Talks',
+        'PC Ps Register',
+        'Task Management',
+        'Process Checklists',
       ],
-      cta: 'Start Free Trial',
+      cta: 'Coming Soon',
       highlighted: false,
+      comingSoon: true,
     },
   ]
 
@@ -117,36 +164,112 @@ export default function Pricing() {
               }`}
               style={plan.highlighted ? { borderColor: 'var(--color-builder-primary)' } : {}}
             >
-              {plan.highlighted && (
+              {plan.highlighted && !plan.comingSoon && (
                 <div className="absolute top-0 right-0 text-gray-900 px-4 py-2 rounded-bl-lg font-semibold text-sm" style={{ backgroundColor: 'var(--color-builder-primary)' }}>
                   POPULAR
                 </div>
               )}
               
               {plan.badge && (
-                <div className="absolute bottom-0 right-0 text-white px-4 py-2 rounded-tl-lg font-semibold text-xs" style={{ backgroundColor: '#EAB308' }}>
-                  💎 {plan.badge}
+                <div 
+                  className="absolute top-0 right-0 font-semibold rounded-bl-lg px-4 py-3 text-sm"
+                  style={plan.comingSoon ? {
+                    backgroundColor: '#FF6B35',
+                    color: 'white',
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                  } : {
+                    backgroundColor: '#EAB308',
+                    color: 'white',
+                    fontSize: '12px',
+                    position: 'absolute',
+                    bottom: '0',
+                    right: '0',
+                    borderRadius: '12px 0 0 0'
+                  }}
+                >
+                  {plan.comingSoon ? '🚀 COMING SOON' : `💎 ${plan.badge}`}
                 </div>
+              )}
+
+              {plan.comingSoon && (
+                <div 
+                  className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900 rounded-xl"
+                  style={{ opacity: 0.05, pointerEvents: 'none' }}
+                />
               )}
 
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-900">{plan.name}</h3>
                 <p className="text-gray-600 text-sm mb-6">{plan.description}</p>
 
-                <div className="mb-6">
+                {plan.comingSoon && (
+                  <div style={{
+                    backgroundColor: '#FEE2E2',
+                    border: '1px solid #FCA5A5',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    marginBottom: '16px',
+                    textAlign: 'center',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: '#DC2626'
+                  }}>
+                    🚀 Coming Soon - Sign up for beta access!
+                  </div>
+                )}
+
+                <div className="mb-6" style={plan.comingSoon ? { opacity: 0.5 } : {}}>
                   <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
                   <span className="text-gray-600">{plan.period}</span>
+                  {plan.annualPrice && (
+                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#059669', fontWeight: 600 }}>
+                      {plan.annualSavings}
+                    </div>
+                  )}
+                  {plan.annualPrice && (
+                    <div style={{ fontSize: '13px', color: '#6B7280' }}>
+                      {plan.annualPrice}/year billed annually
+                    </div>
+                  )}
                 </div>
 
                 <button
                   onClick={() => {
-                    setSelectedPlan(plan.name)
-                    setModalOpen(true)
+                    if (!plan.comingSoon) {
+                      setSelectedPlan(plan.name)
+                      setModalOpen(true)
+                    }
                   }}
+                  disabled={plan.comingSoon}
                   className={plan.highlighted ? 'btn-primary w-full mb-8' : 'btn-secondary w-full mb-8'}
+                  style={plan.comingSoon ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                 >
                   {plan.cta}
                 </button>
+
+                {plan.limits && (
+                  <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #E5E7EB' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: '8px' }}>
+                      Limits
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
+                      <div>
+                        <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Users</div>
+                        <div style={{ color: '#111827', fontWeight: 600, fontSize: '14px' }}>{plan.limits.users}</div>
+                      </div>
+                      <div>
+                        <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Active Projects</div>
+                        <div style={{ color: '#111827', fontWeight: 600, fontSize: '14px' }}>{plan.limits.activeProjects}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #E5E7EB' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: '12px' }}>
+                    Features Included
+                  </div>
+                </div>
 
                 <div className="space-y-4">
                   {plan.features.map((feature, fidx) => (
@@ -163,99 +286,6 @@ export default function Pricing() {
           ))}
         </div>
 
-        {/* Feature Comparison Table */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden" style={{ marginTop: '40px', marginBottom: '40px' }}>
-          <div style={{ padding: '24px 16px', borderBottom: '1px solid #E5E7EB' }}>
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Feature Comparison</h3>
-            <p className="text-gray-600 mt-2 text-sm md:text-base">See exactly what's included in each plan</p>
-          </div>
-
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '2px solid #E5E7EB' }}>
-                  <th style={{ padding: '24px 32px', textAlign: 'left', fontWeight: 600, color: '#111827', fontSize: '16px' }}>
-                    Feature
-                  </th>
-                  <th style={{ padding: '24px 32px', textAlign: 'center', fontWeight: 600, color: '#111827', fontSize: '16px' }}>
-                    Essential
-                  </th>
-                  <th style={{ padding: '24px 32px', textAlign: 'center', fontWeight: 600, color: '#111827', fontSize: '16px', backgroundColor: '#FEF3C7' }}>
-                    Basic
-                  </th>
-                  <th style={{ padding: '24px 32px', textAlign: 'center', fontWeight: 600, color: '#111827', fontSize: '16px' }}>
-                    Professional
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { feature: 'Team Members', essential: '3', basic: '5', professional: '15' },
-                  { feature: 'Unlimited Projects & Storage', essential: '✓', basic: '✓', professional: '✓' },
-                  { feature: 'Mobile App (Time Clock, Site Diary, Photos)', essential: '✓', basic: '✓', professional: '✓' },
-                  { feature: 'Mobile Tasks', essential: '—', basic: '✓', professional: '✓' },
-                  { feature: 'Job Costing & Estimates', essential: '✓', basic: '✓', professional: '✓' },
-                  { feature: 'Invoicing & Quotes', essential: '✓', basic: '✓', professional: '✓' },
-                  { feature: 'Scheduling', essential: 'Basic (List View)', basic: 'Full', professional: 'Full' },
-                  { feature: 'Client Portal', essential: '—', basic: '✓', professional: '✓' },
-                  { feature: 'Xero Integration', essential: '$10/month addon', basic: 'Included', professional: 'Included' },
-                  { feature: 'Staff Management Portal', essential: '—', basic: '—', professional: '✓' },
-                  { feature: 'Leave Management', essential: '—', basic: '—', professional: '✓' },
-                  { feature: 'Purchase Requests & Approvals', essential: '—', basic: '—', professional: '✓' },
-                  { feature: 'Certificate Tracking', essential: '—', basic: '—', professional: '✓' },
-                  { feature: 'Issues Tracking', essential: '—', basic: '—', professional: '✓' },
-                  { feature: 'Email Support', essential: '✓', basic: '✓', professional: '✓' },
-                  { feature: 'Extra Users', essential: '$25/user/month', basic: '$25/user/month', professional: '$25/user/month' },
-                ].map((row, idx) => (
-                  <tr 
-                    key={idx} 
-                    style={{ 
-                      borderBottom: '1px solid #E5E7EB',
-                      backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F9FAFB'
-                    }}
-                  >
-                    <td style={{ padding: '20px 32px', color: '#111827', fontSize: '15px', fontWeight: 500 }}>
-                      {row.feature}
-                    </td>
-                    <td style={{ padding: '20px 32px', textAlign: 'center', color: '#6B7280', fontSize: '15px' }}>
-                      {row.essential === '✓' ? (
-                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#EAB308' }}>✓</span>
-                      ) : row.essential === '—' ? (
-                        <span style={{ fontSize: '20px', color: '#D1D5DB' }}>—</span>
-                      ) : (
-                        row.essential
-                      )}
-                    </td>
-                    <td style={{ padding: '20px 32px', textAlign: 'center', color: '#6B7280', fontSize: '15px', backgroundColor: 'rgba(254, 243, 199, 0.3)' }}>
-                      {row.basic === '✓' ? (
-                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#EAB308' }}>✓</span>
-                      ) : row.basic === '—' ? (
-                        <span style={{ fontSize: '20px', color: '#D1D5DB' }}>—</span>
-                      ) : (
-                        row.basic
-                      )}
-                    </td>
-                    <td style={{ padding: '20px 32px', textAlign: 'center', color: '#6B7280', fontSize: '15px' }}>
-                      {row.professional === '✓' ? (
-                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#EAB308' }}>✓</span>
-                      ) : row.professional === '—' ? (
-                        <span style={{ fontSize: '20px', color: '#D1D5DB' }}>—</span>
-                      ) : (
-                        row.professional
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div style={{ padding: '32px', backgroundColor: '#F9FAFB', borderTop: '1px solid #E5E7EB', textAlign: 'center' }}>
-            <p style={{ color: '#6B7280', fontSize: '14px' }}>
-              💡 All plans include a <strong>free trial with full feature access</strong>. No credit card required.
-            </p>
-          </div>
-        </div>
 
         {/* FAQ */}
         <div className="bg-white rounded-2xl p-10 border border-gray-200" style={{ marginTop: '80px' }}>

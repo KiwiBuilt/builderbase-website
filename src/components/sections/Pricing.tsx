@@ -24,7 +24,7 @@ export default function Pricing() {
       description: 'Core job costing tools - Site Diaries, Change Orders, Timesheets & Invoicing',
       limits: {
         users: 3,
-        activeProjects: 10,
+        activeProjects: 'Unlimited',
       },
       features: [
         'Jobs',
@@ -49,7 +49,7 @@ export default function Pricing() {
       description: 'Essential features for small teams and independent contractors',
       limits: {
         users: 5,
-        activeProjects: 10,
+        activeProjects: 'Unlimited',
       },
       features: [
         'Jobs',
@@ -80,7 +80,7 @@ export default function Pricing() {
       description: 'Full-featured platform for growing construction teams',
       limits: {
         users: 25,
-        activeProjects: 50,
+        activeProjects: 'Unlimited',
       },
       features: [
         'Jobs',
@@ -181,10 +181,6 @@ export default function Pricing() {
                     backgroundColor: '#EAB308',
                     color: 'white',
                     fontSize: '12px',
-                    position: 'absolute',
-                    bottom: '0',
-                    right: '0',
-                    borderRadius: '12px 0 0 0'
                   }}
                 >
                   {plan.comingSoon ? '🚀 COMING SOON' : `💎 ${plan.badge}`}
@@ -199,8 +195,8 @@ export default function Pricing() {
               )}
 
               <div className="p-8">
-                <h3 className="text-2xl font-bold mb-2 text-gray-900">{plan.name}</h3>
-                <p className="text-gray-600 text-sm mb-6">{plan.description}</p>
+                <h3 className="text-2xl font-bold mb-2 text-gray-900" style={{ paddingRight: plan.badge ? '110px' : '0' }}>{plan.name}</h3>
+                <p className="text-gray-600 text-sm mb-6" style={{ paddingRight: plan.badge ? '110px' : '0' }}>{plan.description}</p>
 
                 {plan.comingSoon && (
                   <div style={{

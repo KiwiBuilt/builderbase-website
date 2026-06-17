@@ -23,7 +23,7 @@ export default function Pricing() {
       annualSavings: 'Save 9% annually',
       description: 'Core job costing tools - Site Diaries, Change Orders, Timesheets & Invoicing',
       limits: {
-        users: 3,
+        users: 5,
         activeProjects: 'Unlimited',
       },
       features: [

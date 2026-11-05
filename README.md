@@ -91,7 +91,7 @@ Edit content in individual component files:
 Meta tags are configured in `src/app/layout.tsx`. Update:
 - `og:url` - Your domain
 - `og:image` - Open Graph image
-- Analytics ID - Replace `G-XXXXXXXXXX` with your Google Analytics ID
+- Analytics ID - set `NEXT_PUBLIC_GA_MEASUREMENT_ID` (see `.env.example`). If it is unset, the site uses `G-EJ58C7NBCJ`.
 
 ## Building for Production
 

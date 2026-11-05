@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { trackEvent } from '@/lib/analytics'
+import { getLeadAttribution } from '@/lib/attribution'
+import { trackGaEvent } from '@/lib/ga'
+import { PLANS, trialPlan } from '@/lib/pricing'
 
 interface TrialModalProps {
   isOpen: boolean
@@ -11,31 +14,39 @@ interface TrialModalProps {
 
 export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialModalProps) {
   const [submitted, setSubmitted] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState(preSelectedPlan || '')
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const requestedPlan = PLANS.find((plan) => plan.available && plan.name === preSelectedPlan)
+  const activePlan = requestedPlan ?? trialPlan()
 
-  // Update selected plan when preSelectedPlan changes
   useEffect(() => {
-    setSelectedPlan(preSelectedPlan || '')
-    // Track form started when modal opens
-    if (isOpen) {
-      trackEvent({ event: 'form_started', page: '/trial' })
+    if (!isOpen) {
+      setSubmitted(false)
+      setSubmitError(null)
+      setSubmitting(false)
+      return
     }
-  }, [isOpen, preSelectedPlan])
+    trackEvent({ event: 'form_started', page: '/trial' })
+  }, [isOpen])
 
   if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
+    if (submitting) return
+
     const form = e.currentTarget
     const formData = new FormData(form)
-    const data = Object.fromEntries(formData)
-    data.plan = selectedPlan
-    
+    const data: Record<string, unknown> = Object.fromEntries(formData)
+    const attribution = getLeadAttribution()
+    data.plan = activePlan.name
+    data.source = attribution.source
+    if (attribution.utm) data.utm = attribution.utm
+
+    setSubmitting(true)
+    setSubmitError(null)
+
     try {
-      // Track the trial form completion
-      await trackEvent({ event: 'form_completed' })
-      
       const response = await fetch('/api/trial', {
         method: 'POST',
         headers: {
@@ -43,16 +54,20 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
         },
         body: JSON.stringify(data)
       })
-      
-      if (response.ok) {
-        setSubmitted(true)
-      } else {
-        console.error('Failed to send trial request')
-        setSubmitted(true) // Still show success to user
+
+      if (!response.ok) {
+        setSubmitError('We could not send your trial request. Please try again, or email office@builderbase.co.nz.')
+        return
       }
+
+      trackGaEvent('trial_request', { plan: activePlan.name })
+      await trackEvent({ event: 'form_completed' })
+      setSubmitted(true)
     } catch (error) {
       console.error('Error submitting trial form:', error)
-      setSubmitted(true) // Still show success to user
+      setSubmitError('We could not send your trial request. Please try again, or email office@builderbase.co.nz.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -123,62 +138,42 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
           onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
         >
-          {/* Plan Selection */}
           <div>
             <label className="block font-semibold text-gray-800 mb-3" style={{ fontSize: '14px' }}>
-              Select Your Plan *
+              Your trial plan
             </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[
-                { value: 'Essential Builder', label: 'Essential Builder', price: '$69/month', desc: '3 team members' },
-                { value: 'Basic Builder', label: 'Basic Builder', price: '$199/month', desc: '5 team members' },
-                { value: 'Professional', label: 'Professional', price: '$399/month', desc: '15 team members' },
-              ].map((plan) => (
-                <label
-                  key={plan.value}
+            <input type="hidden" name="plan" value={activePlan.name} />
+            <div
+              style={{
+                padding: '14px 16px',
+                border: '2px solid #EAB308',
+                borderRadius: '12px',
+                backgroundColor: '#FEF3C7',
+              }}
+            >
+              <div style={{ fontWeight: 600, color: '#111827', fontSize: '16px' }}>{activePlan.name}</div>
+              <div style={{ fontSize: '14px', color: '#6B7280', marginTop: '2px' }}>
+                {activePlan.price}/month • {activePlan.usersLabel} • available now
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+              {PLANS.filter((plan) => !plan.available).map((plan) => (
+                <div
+                  key={plan.name}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '14px 16px',
-                    border: selectedPlan === plan.value ? '2px solid #EAB308' : '2px solid #E5E7EB',
+                    padding: '12px 16px',
+                    border: '2px solid #E5E7EB',
                     borderRadius: '12px',
-                    cursor: 'pointer',
-                    backgroundColor: selectedPlan === plan.value ? '#FEF3C7' : 'white',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedPlan !== plan.value) {
-                      e.currentTarget.style.borderColor = '#D1D5DB'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedPlan !== plan.value) {
-                      e.currentTarget.style.borderColor = '#E5E7EB'
-                    }
+                    backgroundColor: '#F9FAFB',
                   }}
                 >
-                  <input
-                    type="radio"
-                    name="plan"
-                    value={plan.value}
-                    checked={selectedPlan === plan.value}
-                    onChange={(e) => setSelectedPlan(e.target.value)}
-                    required
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      marginRight: '12px',
-                      accentColor: '#EAB308',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: '#111827', fontSize: '16px' }}>{plan.label}</div>
-                    <div style={{ fontSize: '14px', color: '#6B7280', marginTop: '2px' }}>
-                      {plan.price} • {plan.desc}
-                    </div>
+                  <div style={{ fontWeight: 600, color: '#6B7280', fontSize: '16px' }}>
+                    {plan.name} · Coming soon
                   </div>
-                </label>
+                  <div style={{ fontSize: '14px', color: '#6B7280', marginTop: '2px' }}>
+                    {plan.price}/month • {plan.usersLabel} • not available to purchase yet
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -360,9 +355,16 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
             />
           </div>
 
+          {submitError && (
+            <p role="alert" style={{ color: '#B91C1C', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', padding: '12px 14px', fontSize: '14px', margin: 0 }}>
+              {submitError}
+            </p>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
+            disabled={submitting}
             className="w-full font-semibold transition-all hover:opacity-90"
             style={{
               padding: '16px',
@@ -370,10 +372,12 @@ export default function TrialModal({ isOpen, onClose, preSelectedPlan }: TrialMo
               backgroundColor: '#EAB308',
               color: '#111827',
               fontSize: '16px',
-              marginTop: '8px'
+              marginTop: '8px',
+              opacity: submitting ? 0.7 : 1,
+              cursor: submitting ? 'wait' : 'pointer',
             }}
           >
-            Request Free Trial
+            {submitting ? 'Sending...' : 'Request Free Trial'}
           </button>
 
           <p className="text-gray-500 text-center" style={{ fontSize: '14px', marginTop: '8px' }}>

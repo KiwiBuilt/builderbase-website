@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { trackEvent } from '@/lib/analytics'
+import { EXTRA_USER_ADDON_COPY, PLANS, PRICING_FAQ_ANSWER } from '@/lib/pricing'
 import TrialModal from '../TrialModal'
 
 export default function Pricing() {
@@ -13,118 +14,13 @@ export default function Pricing() {
     trackEvent({ event: 'pricing_viewed' })
   }, [])
 
-  const plans = [
-    {
-      name: 'Essential',
-      badge: 'Founding Member',
-      price: '$69',
-      period: '/month',
-      annualPrice: '$750',
-      annualSavings: 'Save 9% annually',
-      description: 'Core job costing tools - Site Diaries, Change Orders, Timesheets & Invoicing',
-      limits: {
-        users: 5,
-        activeProjects: 'Unlimited',
-      },
-      features: [
-        'Jobs',
-        'Tasks',
-        'Files',
-        'Financials',
-        'Client Portal',
-        'Invoicing',
-        'Compliance',
-        'Time Clock',
-      ],
-      cta: 'Start Free Trial',
-      highlighted: false,
-    },
-    {
-      name: 'Basic',
-      badge: 'COMING SOON',
-      price: '$149',
-      period: '/month',
-      annualPrice: '$1490',
-      annualSavings: 'Save 17% annually',
-      description: 'Essential features for small teams and independent contractors',
-      limits: {
-        users: 5,
-        activeProjects: 'Unlimited',
-      },
-      features: [
-        'Jobs',
-        'Tasks',
-        'Files',
-        'Financials',
-        'Client Portal',
-        'Invoicing',
-        'Basic Reporting',
-        'Web Analytics',
-        'Lead Forms',
-        'Compliance',
-        'Messaging',
-        'Sales Pipeline',
-        'Task Management',
-      ],
-      cta: 'Coming Soon',
-      highlighted: true,
-      comingSoon: true,
-    },
-    {
-      name: 'Professional',
-      badge: 'COMING SOON',
-      price: '$349',
-      period: '/month',
-      annualPrice: '$3490',
-      annualSavings: 'Save 17% annually',
-      description: 'Full-featured platform for growing construction teams',
-      limits: {
-        users: 25,
-        activeProjects: 'Unlimited',
-      },
-      features: [
-        'Jobs',
-        'Tasks',
-        'Files',
-        'Financials',
-        'Client Portal',
-        'Invoicing',
-        'Basic Reporting',
-        'Web Analytics',
-        'Lead Forms',
-        'Compliance',
-        'Messaging',
-        'Sales Pipeline',
-        'Staff Management',
-        'Home Portal',
-        'Leave Management',
-        'Purchase Requests',
-        'Certificate Tracking',
-        'Vehicle Management',
-        'Time Clock',
-        'Advanced Reporting',
-        'Job Map',
-        'Past Jobs',
-        'Job Schedule',
-        'Selections',
-        'Toolbox Talks',
-        'PC Ps Register',
-        'Task Management',
-        'Process Checklists',
-      ],
-      cta: 'Coming Soon',
-      highlighted: true,
-      comingSoon: true,
-    },
-  ]
-
   return (
     <section id="pricing" className="bg-gray-50" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
       <div className="container-custom">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 px-4" style={{ marginBottom: '16px' }}>Simple, Transparent Pricing</h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed" style={{ maxWidth: '48rem', margin: '0 auto', textAlign: 'center', paddingLeft: '16px', paddingRight: '16px', paddingBottom: '16px' }}>
-            Choose the plan that fits your business. Add extra users anytime at $25/user/month
+            Choose the plan that fits your business. {EXTRA_USER_ADDON_COPY}
           </p>
         </div>
 
@@ -146,7 +42,7 @@ export default function Pricing() {
             Lock in Your Founding Member Rates
           </div>
           <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '12px', paddingLeft: '12px', paddingRight: '12px' }}>
-            Sign up now and lock in these prices for as long as you stay subscribed. Prices will increase as we build out features—if you cancel and rejoin later, new pricing applies.
+            Essential is available to start today. Basic and Professional are coming soon and cannot be purchased yet. When you subscribe, you lock in that plan&apos;s price for as long as you stay subscribed.
           </p>
           <div style={{ fontSize: '12px', color: '#92400E', fontWeight: 600 }}>
             Get grandfathered-in pricing while it lasts
@@ -154,51 +50,35 @@ export default function Pricing() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {plans.map((plan, idx) => (
+          {PLANS.map((plan) => (
             <div
-              key={idx}
-              className={`relative rounded-xl overflow-hidden transition-all ${
-                plan.highlighted
-                  ? 'md:scale-105 bg-white shadow-2xl border-2'
-                  : 'bg-white border border-gray-200 shadow-lg'
+              key={plan.name}
+              className={`relative rounded-xl overflow-hidden transition-all bg-white border shadow-lg ${
+                plan.available ? 'border-gray-200' : 'border-2'
               }`}
-              style={plan.highlighted ? { borderColor: 'var(--color-builder-primary)' } : {}}
+              style={plan.available ? undefined : { borderColor: 'var(--color-builder-primary)' }}
             >
-              {plan.highlighted && !plan.comingSoon && (
-                <div className="absolute top-0 right-0 text-gray-900 px-4 py-2 rounded-bl-lg font-semibold text-sm" style={{ backgroundColor: 'var(--color-builder-primary)' }}>
-                  POPULAR
-                </div>
-              )}
-              
               {plan.badge && (
                 <div 
                   className="absolute top-0 right-0 font-semibold rounded-bl-lg px-4 py-3 text-sm"
-                  style={plan.comingSoon ? {
-                    backgroundColor: '#FF6B35',
-                    color: 'white',
-                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                  } : {
+                  style={plan.available ? {
                     backgroundColor: '#EAB308',
                     color: 'white',
                     fontSize: '12px',
+                  } : {
+                    backgroundColor: '#FF6B35',
+                    color: 'white',
                   }}
                 >
-                  {plan.comingSoon ? '🚀 COMING SOON' : `💎 ${plan.badge}`}
+                  {plan.available ? `💎 ${plan.badge}` : '🚀 COMING SOON'}
                 </div>
-              )}
-
-              {plan.comingSoon && (
-                <div 
-                  className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900 rounded-xl"
-                  style={{ opacity: 0.05, pointerEvents: 'none' }}
-                />
               )}
 
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-900" style={{ paddingRight: plan.badge ? '110px' : '0' }}>{plan.name}</h3>
                 <p className="text-gray-600 text-sm mb-6" style={{ paddingRight: plan.badge ? '110px' : '0' }}>{plan.description}</p>
 
-                {plan.comingSoon && (
+                {!plan.available && (
                   <div style={{
                     backgroundColor: '#FEE2E2',
                     border: '1px solid #FCA5A5',
@@ -210,11 +90,11 @@ export default function Pricing() {
                     fontWeight: 600,
                     color: '#DC2626'
                   }}>
-                    🚀 Coming Soon - Sign up for beta access!
+                    Coming soon — not available to purchase yet
                   </div>
                 )}
 
-                <div className="mb-6" style={plan.comingSoon ? { opacity: 0.5 } : {}}>
+                <div className="mb-6" style={plan.available ? undefined : { opacity: 0.7 }}>
                   <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
                   <span className="text-gray-600">{plan.period}</span>
                   {plan.annualPrice && (
@@ -230,36 +110,34 @@ export default function Pricing() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => {
-                    if (!plan.comingSoon) {
-                      setSelectedPlan(plan.name)
-                      setModalOpen(true)
-                    }
+                    if (!plan.available) return
+                    setSelectedPlan(plan.name)
+                    setModalOpen(true)
                   }}
-                  disabled={plan.comingSoon}
-                  className={plan.highlighted ? 'btn-primary w-full mb-8' : 'btn-secondary w-full mb-8'}
-                  style={plan.comingSoon ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+                  disabled={!plan.available}
+                  className={plan.available ? 'btn-primary w-full mb-8' : 'btn-secondary w-full mb-8'}
+                  style={plan.available ? undefined : { opacity: 0.6, cursor: 'not-allowed' }}
                 >
-                  {plan.cta}
+                  {plan.available ? 'Start Free Trial' : 'Coming Soon'}
                 </button>
 
-                {plan.limits && (
-                  <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #E5E7EB' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: '8px' }}>
-                      Limits
+                <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #E5E7EB' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: '8px' }}>
+                    Limits
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
+                    <div>
+                      <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Users</div>
+                      <div style={{ color: '#111827', fontWeight: 600, fontSize: '14px' }}>{plan.users}</div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
-                      <div>
-                        <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Users</div>
-                        <div style={{ color: '#111827', fontWeight: 600, fontSize: '14px' }}>{plan.limits.users}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Active Projects</div>
-                        <div style={{ color: '#111827', fontWeight: 600, fontSize: '14px' }}>{plan.limits.activeProjects}</div>
-                      </div>
+                    <div>
+                      <div style={{ color: '#6B7280', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600 }}>Active Projects</div>
+                      <div style={{ color: '#111827', fontWeight: 600, fontSize: '14px' }}>{plan.activeProjects}</div>
                     </div>
                   </div>
-                )}
+                </div>
 
                 <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #E5E7EB' }}>
                   <div style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: '12px' }}>
@@ -289,6 +167,10 @@ export default function Pricing() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               {
+                q: 'What are the monthly prices?',
+                a: PRICING_FAQ_ANSWER,
+              },
+              {
                 q: 'Does the mobile app work without internet?',
                 a: 'Yes. Your crew can work offline on site, and everything syncs when they reconnect.',
               },
@@ -298,7 +180,7 @@ export default function Pricing() {
               },
               {
                 q: 'Can I integrate with Xero?',
-                a: 'Yes, on Basic and Professional plans. Essential Builder doesn\'t include Xero sync.',
+                a: 'Yes, on Basic and Professional plans. Essential doesn\'t include Xero sync.',
               },
               {
                 q: 'Does the free trial include all features?',

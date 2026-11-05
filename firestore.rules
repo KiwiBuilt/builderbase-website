@@ -22,6 +22,15 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // Marketing trial and demo requests. Create only; not publicly readable.
+    match /websiteLeads/{leadId} {
+      allow create: if request.resource.data.type in ['trial', 'demo']
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() < 320;
+      allow read, update, delete: if false;
+    }
+
     // Deny everything else
     match /{document=**} {
       allow read, write: if false;

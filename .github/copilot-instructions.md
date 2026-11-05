@@ -69,7 +69,7 @@ Use `style={{ color: 'var(--color-builder-primary)' }}` for inline styles with t
 - Custom Tailwind color classes like `text-builder-primary` don't work due to Tailwind v4 changes
 - Use inline `style` props with CSS variables instead: `style={{ color: 'var(--color-builder-primary)' }}`
 - SEO meta tags are in `src/app/layout.tsx` - update for production domain
-- Replace Google Analytics ID `G-XXXXXXXXXX` with actual tracking ID
+- Google Analytics reads `NEXT_PUBLIC_GA_MEASUREMENT_ID` and falls back to `G-EJ58C7NBCJ`
 - Update Open Graph image path from `/og-image.png` to actual image
 
 ## Component Guidelines
@@ -92,7 +92,7 @@ Use `style={{ color: 'var(--color-builder-primary)' }}` for inline styles with t
 - ✅ Meta tags configured in layout.tsx
 - ✅ Open Graph tags for social sharing
 - ⚠️ Update domain from localhost in metadata
-- ⚠️ Add Google Analytics tracking ID
+- ✅ Google Analytics uses `NEXT_PUBLIC_GA_MEASUREMENT_ID`, falling back to `G-EJ58C7NBCJ`
 - ⚠️ Create sitemap.xml
 - ⚠️ Create robots.txt
 

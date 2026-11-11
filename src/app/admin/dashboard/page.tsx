@@ -12,7 +12,14 @@ export default function AdminDashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [blogs, setBlogs] = useState<any[]>([])
-  const [stats, setStats] = useState({ totalVisits: 0, totalBlogs: 0, pendingComments: 0 })
+  const [stats, setStats] = useState({
+    totalVisits: 0,
+    totalBlogs: 0,
+    pendingComments: 0,
+    leadCount: 0,
+    newLeads: 0,
+    leadsUnavailable: false,
+  })
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -39,22 +46,44 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const [blogsRes, commentsRes] = await Promise.all([
+      const [blogsRes, commentsRes, leadsRes] = await Promise.all([
         fetch('/api/blogs'),
         fetch('/api/comments?pending=true'),
+        fetch('/api/leads?summary=1', { cache: 'no-store' }),
       ])
 
+      let totalBlogs = 0
+      let pendingComments = 0
       if (blogsRes.ok && commentsRes.ok) {
         const blogs = await blogsRes.json()
         const comments = await commentsRes.json()
-        setStats({
-          totalVisits: 0,
-          totalBlogs: blogs.length,
-          pendingComments: comments.length,
-        })
+        totalBlogs = Array.isArray(blogs) ? blogs.length : 0
+        pendingComments = Array.isArray(comments) ? comments.length : 0
       }
+
+      let leadCount = 0
+      let newLeads = 0
+      let leadsUnavailable = true
+      if (leadsRes.ok) {
+        const payload = await leadsRes.json()
+        if (payload && typeof payload.total === 'number') {
+          leadCount = payload.total
+          newLeads = typeof payload.byStatus?.new === 'number' ? payload.byStatus.new : 0
+          leadsUnavailable = false
+        }
+      }
+
+      setStats({
+        totalVisits: 0,
+        totalBlogs,
+        pendingComments,
+        leadCount,
+        newLeads,
+        leadsUnavailable,
+      })
     } catch (error) {
       console.error('Error loading stats:', error)
+      setStats((current) => ({ ...current, leadsUnavailable: true }))
     } finally {
       setLoading(false)
     }
@@ -101,6 +130,23 @@ export default function AdminDashboard() {
             <p style={{ fontSize: '16px', color: '#6B7280' }}>Welcome back, {session?.user?.name}</p>
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Link
+              href="/admin/leads"
+              style={{
+                padding: '10px 16px',
+                backgroundColor: '#FFFBEB',
+                color: '#111827',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: '1px solid #EAB308',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                display: 'inline-block',
+              }}
+            >
+              Leads
+            </Link>
             <Link
               href="/admin/gallery"
               style={{
@@ -194,31 +240,61 @@ export default function AdminDashboard() {
               }}
             >
               {[
+                {
+                  label: 'Website Leads',
+                  value: stats.leadsUnavailable ? 'Setup' : stats.leadCount,
+                  detail: stats.leadsUnavailable
+                    ? 'Server credentials needed'
+                    : stats.leadCount === 0
+                      ? 'No leads yet'
+                      : `${stats.newLeads} new`,
+                  color: '#EAB308',
+                  href: '/admin/leads',
+                },
                 { label: 'Total Blog Posts', value: stats.totalBlogs, color: '#3B82F6' },
                 { label: 'Pending Comments', value: stats.pendingComments, color: '#F59E0B' },
                 { label: 'Visitor Tracking', value: 'Active', color: '#10B981' },
-              ].map((stat, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    backgroundColor: '#FFFFFF',
-                    padding: '24px',
-                    borderRadius: '12px',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>{stat.label}</p>
+              ].map((stat) => {
+                const card = (
                   <div
                     style={{
-                      fontSize: '32px',
-                      fontWeight: 'bold',
-                      color: stat.color,
+                      backgroundColor: '#FFFFFF',
+                      padding: '24px',
+                      borderRadius: '12px',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                      height: '100%',
+                      boxSizing: 'border-box',
                     }}
                   >
-                    {stat.value}
+                    <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>{stat.label}</p>
+                    <div
+                      style={{
+                        fontSize: '32px',
+                        fontWeight: 'bold',
+                        color: stat.color,
+                      }}
+                    >
+                      {stat.value}
+                    </div>
+                    {'detail' in stat && stat.detail ? (
+                      <p style={{ fontSize: '13px', color: '#6B7280', marginTop: '8px' }}>{stat.detail}</p>
+                    ) : null}
                   </div>
-                </div>
-              ))}
+                )
+                return 'href' in stat && stat.href ? (
+                  <Link
+                    key={stat.label}
+                    href={stat.href}
+                    style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}
+                  >
+                    {card}
+                  </Link>
+                ) : (
+                  <div key={stat.label} style={{ height: '100%' }}>
+                    {card}
+                  </div>
+                )
+              })}
             </div>
 
             {/* Blog List */}

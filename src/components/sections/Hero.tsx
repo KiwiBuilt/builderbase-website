@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import TrialModal from '../TrialModal'
 import DemoModal from '../DemoModal'
 
@@ -50,6 +51,11 @@ export default function Hero() {
             </svg>
             <span className="text-base">14-day free trial, no credit card required</span>
           </div>
+          <p className="mt-6 text-center">
+            <Link href="/blog" className="text-base font-semibold text-gray-700 hover:text-gray-900">
+              Read the blog
+            </Link>
+          </p>
         </div>
       </div>
 

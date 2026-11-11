@@ -1,225 +1,72 @@
-'use client'
-
-import { useEffect, useState } from 'react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
+import SiteFrame from '@/components/blog/SiteFrame'
+import BlogBrowser from '@/components/blog/BlogBrowser'
+import { listPublishedPosts } from '@/lib/blog-public'
+import { buildBlogIndexSchema, buildBreadcrumbList, formatNzDate, jsonLd, postPublishedIso } from '@/lib/blog'
+import { SITE_NAME, SITE_OG_IMAGE_URL, SITE_URL } from '@/lib/site'
 
-const CATEGORIES = ['All', 'General', 'Tips & Tricks', 'Case Studies', 'Updates', 'Guides', 'Industry News']
+export const revalidate = 3600
 
-export default function BlogPage() {
-  const [blogs, setBlogs] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState('All')
+const description = 'Tips, tricks, and insights for construction management in New Zealand.'
 
-  useEffect(() => {
-    loadBlogs()
-  }, [])
+export const metadata: Metadata = {
+  title: `Blog | ${SITE_NAME}`,
+  description,
+  alternates: { canonical: `${SITE_URL}/blog` },
+  openGraph: {
+    type: 'website',
+    url: `${SITE_URL}/blog`,
+    title: `Blog | ${SITE_NAME}`,
+    description,
+    siteName: SITE_NAME,
+    images: [{ url: SITE_OG_IMAGE_URL, width: 1200, height: 630, alt: `${SITE_NAME} blog` }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Blog | ${SITE_NAME}`,
+    description,
+    images: [SITE_OG_IMAGE_URL],
+  },
+}
 
-  const loadBlogs = async () => {
-    try {
-      const res = await fetch('/api/blogs')
-      if (res.ok) {
-        const data = await res.json()
-        // Filter to published blogs only
-        setBlogs(data.filter((blog: any) => blog.published))
-      }
-    } catch (error) {
-      console.error('Error loading blogs:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '60vh',
-          backgroundColor: '#F9FAFB',
-        }}
-      >
-        <p style={{ fontSize: '16px', color: '#6B7280' }}>Loading blog posts...</p>
-      </div>
-    )
-  }
+export default async function BlogPage() {
+  const posts = await listPublishedPosts()
+  const cards = posts.map((post) => ({
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt || post.metaDescription,
+    category: post.category,
+    featuredImage: post.featuredImage,
+    featuredImageAlt: post.featuredImageAlt || post.title,
+    publishedLabel: formatNzDate(postPublishedIso(post)),
+    publishedIso: postPublishedIso(post),
+  }))
+  const schema = [buildBlogIndexSchema(posts), buildBreadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog' },
+  ])]
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
-      {/* Header */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #E5E7EB',
-          padding: '48px 16px',
-        }}
-      >
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '40px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
-            Blog
-          </h1>
-          <p style={{ fontSize: '18px', color: '#6B7280' }}>
-            Tips, tricks, and insights for construction management
-          </p>
+    <SiteFrame>
+      <div className="border-b border-gray-200 bg-white">
+        <div className="container-custom py-12">
+          <nav className="mb-4 text-sm text-gray-500">
+            <Link href="/" className="hover:text-gray-900">Home</Link>
+            <span> / </span>
+            <span>Blog</span>
+          </nav>
+          <h1 className="text-4xl font-bold text-gray-900">Blog</h1>
+          <p className="mt-2 text-lg text-gray-600">{description}</p>
         </div>
       </div>
-
-      {/* Blog List */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 16px' }}>
-        {/* Category Filter */}
-        <div style={{ marginBottom: '40px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: selectedCategory === cat ? '#EAB308' : '#FFFFFF',
-                border: `2px solid ${selectedCategory === cat ? '#EAB308' : '#E5E7EB'}`,
-                borderRadius: '24px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: selectedCategory === cat ? '#111827' : '#6B7280',
-                transition: 'all 0.2s',
-              }}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {blogs.length === 0 ? (
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '18px', color: '#6B7280' }}>No blog posts yet. Check back soon!</p>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '32px',
-            }}
-          >
-            {blogs
-              .filter((blog) => selectedCategory === 'All' || blog.category === selectedCategory)
-              .map((blog) => (
-                <Link
-                  key={blog.id}
-                  href={`/blog/${blog.slug}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                <div
-                  style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    cursor: 'pointer',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'
-                    ;(e.currentTarget as HTMLElement).style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
-                    ;(e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
-                  }}
-                >
-                  {/* Featured Image */}
-                  {blog.featuredImage && (
-                    <div style={{ width: '100%', height: '200px', overflow: 'hidden', backgroundColor: '#E5E7EB' }}>
-                      <img
-                        src={blog.featuredImage}
-                        alt={blog.title}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {/* Content */}
-                  <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ marginBottom: '8px' }}>
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          backgroundColor: '#FEF3C7',
-                          color: '#92400E',
-                          padding: '4px 12px',
-                          borderRadius: '12px',
-                        }}
-                      >
-                        {blog.category || 'General'}
-                      </span>
-                    </div>
-                    <h2
-                      style={{
-                        fontSize: '20px',
-                        fontWeight: 'bold',
-                        color: '#111827',
-                        marginBottom: '8px',
-                      }}
-                    >
-                      {blog.title}
-                    </h2>
-
-                    <p
-                      style={{
-                        fontSize: '14px',
-                        color: '#6B7280',
-                        marginBottom: '16px',
-                        flex: 1,
-                      }}
-                    >
-                      {blog.excerpt}
-                    </p>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        paddingTop: '12px',
-                        borderTop: '1px solid #E5E7EB',
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          color: '#9CA3AF',
-                        }}
-                      >
-                        {blog.views || 0} views
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          color: '#EAB308',
-                          fontWeight: '600',
-                        }}
-                      >
-                        Read →
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
+      <div className="container-custom py-12">
+        <BlogBrowser posts={cards} />
       </div>
-    </div>
+      {schema.map((entry) => (
+        <script key={entry['@type'] as string} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(entry) }} />
+      ))}
+    </SiteFrame>
   )
 }

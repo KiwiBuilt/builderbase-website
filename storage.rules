@@ -2,8 +2,12 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    // Anyone can view blog images embedded in published posts.
+    // Uploads and deletes go through the Next.js admin API with Firebase Admin.
+    // Publish this file in the Firebase console (Storage > Rules) or it does not take effect.
     match /blog-images/{allPaths=**} {
-      allow read, write, delete: if true;
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

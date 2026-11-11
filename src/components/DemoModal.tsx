@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { trackEvent } from '@/lib/analytics'
+import { getLeadAttribution } from '@/lib/attribution'
+import { trackGaEvent } from '@/lib/ga'
 
 interface DemoModalProps {
   isOpen: boolean
@@ -10,43 +12,57 @@ interface DemoModalProps {
 
 export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    // Track form started when modal opens
-    if (isOpen) {
-      trackEvent({ event: 'form_started', page: '/demo' })
+    if (!isOpen) {
+      setSubmitted(false)
+      setSubmitError(null)
+      setSubmitting(false)
+      return
     }
+    trackEvent({ event: 'form_started', page: '/demo' })
   }, [isOpen])
 
   if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
+    if (submitting) return
+
     const form = e.currentTarget
     const formData = new FormData(form)
-    
+    const data: Record<string, unknown> = Object.fromEntries(formData)
+    const attribution = getLeadAttribution()
+    data.source = attribution.source
+    if (attribution.utm) data.utm = attribution.utm
+
+    setSubmitting(true)
+    setSubmitError(null)
+
     try {
-      // Track the demo form completion
-      await trackEvent({ event: 'form_completed' })
-      
       const response = await fetch('/api/demo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(Object.fromEntries(formData))
+        body: JSON.stringify(data)
       })
-      
-      if (response.ok) {
-        setSubmitted(true)
-      } else {
-        console.error('Failed to send demo request')
-        setSubmitted(true) // Still show success to user
+
+      if (!response.ok) {
+        setSubmitError('We could not send your demo request. Please try again, or email office@builderbase.co.nz.')
+        return
       }
+
+      trackGaEvent('demo_request')
+      await trackEvent({ event: 'form_completed' })
+      setSubmitted(true)
     } catch (error) {
       console.error('Error submitting demo form:', error)
-      setSubmitted(true) // Still show success to user
+      setSubmitError('We could not send your demo request. Please try again, or email office@builderbase.co.nz.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -351,9 +367,16 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
             />
           </div>
 
+          {submitError && (
+            <p role="alert" style={{ color: '#B91C1C', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', padding: '12px 14px', fontSize: '14px', margin: 0 }}>
+              {submitError}
+            </p>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
+            disabled={submitting}
             className="w-full font-semibold transition-all hover:opacity-90"
             style={{
               padding: '16px',
@@ -361,10 +384,12 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
               backgroundColor: '#EAB308',
               color: '#111827',
               fontSize: '16px',
-              marginTop: '8px'
+              marginTop: '8px',
+              opacity: submitting ? 0.7 : 1,
+              cursor: submitting ? 'wait' : 'pointer',
             }}
           >
-            Request Demo
+            {submitting ? 'Sending...' : 'Request Demo'}
           </button>
 
           <p className="text-gray-500 text-center" style={{ fontSize: '14px', marginTop: '8px' }}>

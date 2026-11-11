@@ -83,8 +83,7 @@ url: 'https://yourdomain.co.nz'
 ```
 
 ### Add Google Analytics
-In `src/app/layout.tsx`, replace:
-- `G-XXXXXXXXXX` with your actual Google Analytics ID
+Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env.example` / your host. The public ID is `G-EJ58C7NBCJ`. If the variable is blank, the site uses that ID automatically.
 
 ### Update Content
 Edit individual component files:
@@ -127,7 +126,7 @@ npm run lint
 - [x] Mobile responsive
 - [x] Sitemap created
 - [x] Robots.txt created
-- [ ] Google Analytics ID added (TODO)
+- [x] Google Analytics ID falls back to `G-EJ58C7NBCJ` (`NEXT_PUBLIC_GA_MEASUREMENT_ID`)
 - [ ] Domain updated (TODO)
 - [ ] Favicon added (TODO)
 - [ ] OG image added (TODO)

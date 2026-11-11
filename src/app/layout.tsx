@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { AuthSessionProvider } from '@/components/SessionProvider'
 import PageTracker from '@/components/PageTracker'
+import { PLANS, SITE_DESCRIPTION } from '@/lib/pricing'
+import { resolveGaMeasurementId } from '@/lib/ga'
 
 export const metadata: Metadata = {
   title: 'BUILDER BASE - Construction Management Software for NZ Builders',
-  description: 'All-in-one construction management platform for NZ builders. Job costing, invoicing, project tracking, mobile app, team scheduling, client portals, and Xero integration. Start free trial - no credit card required.',
+  description: SITE_DESCRIPTION,
   keywords: 'construction management software, builder app NZ, job costing, invoicing software, project management builders, construction tracking, team scheduling, mobile time tracking, Xero integration, client portal software, construction estimating, building management platform, New Zealand builders',
   authors: [{ name: 'BUILDER BASE' }],
   creator: 'BUILDER BASE',
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     url: 'https://builderbase.co.nz',
     siteName: 'BUILDER BASE',
     title: 'BUILDER BASE - Construction Management Software for NZ Builders',
-    description: 'All-in-one construction management platform. Job costing, invoicing, scheduling, mobile app, team management. Start your free trial today.',
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: 'https://builderbase.co.nz/og-image.svg',
@@ -39,7 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'BUILDER BASE - Construction Management Software for NZ Builders',
-    description: 'All-in-one construction management platform for builders. Job costing, invoicing, mobile app, and more.',
+    description: SITE_DESCRIPTION,
     images: ['https://builderbase.co.nz/og-image.svg'],
     creator: '@builderbasehq',
   },
@@ -64,6 +66,29 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const gaId = resolveGaMeasurementId(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID)
+  const softwareSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'BUILDER BASE',
+    description: 'Construction management software for builders in New Zealand',
+    applicationCategory: 'BusinessApplication',
+    url: 'https://builderbase.co.nz',
+    operatingSystem: 'Web, iOS, Android',
+    offers: PLANS.map((plan) => ({
+      '@type': 'Offer',
+      name: plan.name,
+      price: String(plan.priceMonthly),
+      priceCurrency: 'NZD',
+      availability: plan.available
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      description: plan.available
+        ? `${plan.usersLabel}, ${plan.activeProjects.toLowerCase()} active projects. ${plan.price}/month. Available now.`
+        : `Coming soon. Not yet available to purchase. ${plan.usersLabel}. ${plan.price}/month.`,
+    })),
+  }
+
   return (
     <html lang="en-NZ">
       <head>
@@ -104,43 +129,7 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'SoftwareApplication',
-              name: 'BUILDER BASE',
-              description: 'Construction management software for builders in New Zealand',
-              applicationCategory: 'BusinessApplication',
-              url: 'https://builderbase.co.nz',
-              operatingSystem: 'Web, iOS, Android',
-              offers: [
-                {
-                  '@type': 'Offer',
-                  name: 'Essential Builder',
-                  price: '69',
-                  priceCurrency: 'NZD',
-                  description: 'Solo builders (1-3 people) with unlimited projects',
-                },
-                {
-                  '@type': 'Offer',
-                  name: 'Basic Builder',
-                  price: '199',
-                  priceCurrency: 'NZD',
-                  description: 'Small crews (1-5 people) who need mobile time tracking',
-                },
-                {
-                  '@type': 'Offer',
-                  name: 'Professional',
-                  price: '399',
-                  priceCurrency: 'NZD',
-                  description: 'Growing businesses (5-15 staff) needing team management',
-                },
-              ],
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                ratingCount: '47',
-              },
-            }),
+            __html: JSON.stringify(softwareSchema),
           }}
         />
         
@@ -159,24 +148,29 @@ export default function RootLayout({
           }}
         />
 
-        {/* Google Analytics 4 */}
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
-        ></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-XXXXXXXXXX', {
-                'page_path': window.location.pathname,
-                'page_title': document.title,
-              });
-            `,
-          }}
-        />
+        {/* Google Analytics 4. Loaded only when a measurement ID is available. */}
+        {gaId ? (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+            ></script>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  window.gtag = gtag;
+                  gtag('js', new Date());
+                  gtag('config', '${gaId}', {
+                    'page_path': window.location.pathname,
+                    'page_title': document.title,
+                  });
+                `,
+              }}
+            />
+          </>
+        ) : null}
 
         {/* Ahrefs Analytics */}
         <script

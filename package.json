@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --test src/lib/lead-records.test.ts src/lib/firebase-admin.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/lead-records.test.ts src/lib/firebase-admin.test.ts"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.4",

@@ -27,14 +27,17 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/#features" className="text-gray-600 hover:text-gray-900 transition-colors">
               Features
             </Link>
-            <Link href="#for-builders" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/#for-builders" className="text-gray-600 hover:text-gray-900 transition-colors">
               For Builders
             </Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
               Pricing
+            </Link>
+            <Link href="/blog" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Blog
             </Link>
           </nav>
 
@@ -62,9 +65,10 @@ export default function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <nav className="md:hidden pb-4 flex flex-col gap-4">
-            <Link href="#features" className="text-gray-600 hover:text-gray-900">Features</Link>
-            <Link href="#for-builders" className="text-gray-600 hover:text-gray-900">For Builders</Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
+            <Link href="/#features" className="text-gray-600 hover:text-gray-900">Features</Link>
+            <Link href="/#for-builders" className="text-gray-600 hover:text-gray-900">For Builders</Link>
+            <Link href="/#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
+            <Link href="/blog" className="text-gray-600 hover:text-gray-900">Blog</Link>
             <button onClick={() => setModalOpen(true)} className="btn-primary w-full text-sm">Start Free Trial</button>
           </nav>
         )}

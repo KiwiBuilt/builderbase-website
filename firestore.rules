@@ -2,23 +2,43 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Blogs - public read/write (pages are protected by NextAuth)
-    match /blogs/{document=**} {
-      allow read, write: if true;
+    // Published posts are public. Drafts are not. Clients cannot write posts.
+    // Creating, editing, and publishing go through the Next.js admin APIs with
+    // Firebase Admin (NextAuth). Publish this file in the Firebase console
+    // (Firestore Database > Rules) or these rules do not take effect.
+    match /blogs/{blogId} {
+      allow read: if resource.data.published == true;
+      allow create, update, delete: if false;
     }
 
-    // Comments - public read/write (pages are protected by NextAuth)
-    match /comments/{document=**} {
-      allow read, write: if true;
+    // Visitors may submit a comment that stays unapproved, and may read
+    // approved comments. Moderation is server-only.
+    match /comments/{commentId} {
+      allow read: if resource.data.approved == true;
+      allow create: if request.resource.data.approved == false
+        && request.resource.data.blogId is string
+        && request.resource.data.blogId.size() > 0
+        && request.resource.data.blogId.size() < 200
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() < 200
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() < 320
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 10
+        && request.resource.data.content.size() < 5000;
+      allow update, delete: if false;
     }
 
-    // Analytics - public read/write (for tracking)
-    match /analytics/{document=**} {
-      allow read, write: if true;
-    }
-
-    // Settings - public read/write (pages are protected by NextAuth)
+    // AI writing rules are server-only.
     match /settings/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Visitor analytics. Unchanged: the existing tracker writes with the
+    // client SDK. This block is not loosened.
+    match /analytics/{document=**} {
       allow read, write: if true;
     }
 

@@ -1,129 +1,99 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/firebase'
-import {
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  where,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { validateCommentInput } from '@/lib/blog'
+import { listApprovedComments } from '@/lib/blog-public'
+import { deleteComment, describeBlogAdminError, listCommentsForAdmin, setCommentApproval } from '@/lib/blog-admin'
 
-// Get comments for a blog or all pending comments
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
+const noStore = { 'Cache-Control': 'no-store' }
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const blogId = searchParams.get('blogId')
-    const pendingOnly = searchParams.get('pending')
     const session = await getServerSession(authOptions)
+    const blogId = request.nextUrl.searchParams.get('blogId')
+    const pending = request.nextUrl.searchParams.get('pending') === 'true'
+    const approvedParam = request.nextUrl.searchParams.get('approved')
 
-    if (!session && pendingOnly) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!session?.user) {
+      if (!blogId || pending || approvedParam) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore })
+      }
+      const comments = await listApprovedComments(blogId)
+      return NextResponse.json(comments, { headers: noStore })
     }
 
-    const commentsRef = collection(db, 'comments')
-    let q
+    let approved: boolean | null = null
+    if (pending) approved = false
+    else if (approvedParam === 'true') approved = true
+    else if (approvedParam === 'false') approved = false
 
-    if (blogId && !pendingOnly) {
-      // Get published comments for a blog
-      q = query(commentsRef, where('blogId', '==', blogId), where('approved', '==', true))
-    } else if (pendingOnly) {
-      // Get pending comments for admin
-      q = query(commentsRef, where('approved', '==', false))
-    } else {
-      // Get all comments for admin
-      q = query(commentsRef)
-    }
-
-    const commentsSnapshot = await getDocs(q)
-    const comments = commentsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Record<string, any>),
-    }))
-
-    return NextResponse.json(comments)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    const comments = await listCommentsForAdmin({ blogId, approved })
+    return NextResponse.json(comments, { headers: noStore })
+  } catch (error) {
+    const failure = describeBlogAdminError(error)
+    return NextResponse.json(failure.body, { status: failure.status, headers: noStore })
   }
 }
 
-// Create a new comment
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { blogId, name, email, content } = body
+    const parsed = validateCommentInput(body)
+    if (parsed.ok === false) return NextResponse.json({ error: parsed.error }, { status: 400, headers: noStore })
 
-    if (!blogId || !name || !email || !content) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
-
-    const commentsRef = collection(db, 'comments')
-    const docRef = await addDoc(commentsRef, {
-      blogId,
-      name,
-      email,
-      content,
+    const docRef = await addDoc(collection(db, 'comments'), {
+      blogId: parsed.value.blogId,
+      name: parsed.value.name,
+      email: parsed.value.email,
+      content: parsed.value.content,
       approved: false,
       createdAt: serverTimestamp(),
     })
-
-    return NextResponse.json({ id: docRef.id, success: true })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ id: docRef.id, success: true }, { headers: noStore })
+  } catch (error) {
+    console.error('Comment create failed:', error)
+    return NextResponse.json({ error: 'Could not save that comment.' }, { status: 500, headers: noStore })
   }
 }
 
-// Approve or reject a comment
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
+    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore })
     const body = await request.json()
-    const { id, approved } = body
-
-    if (!id) {
-      return NextResponse.json({ error: 'Comment ID required' }, { status: 400 })
-    }
-
-    const commentRef = doc(db, 'comments', id)
-    await updateDoc(commentRef, { approved })
-
-    return NextResponse.json({ success: true })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    const id = typeof body?.id === 'string' ? body.id : ''
+    if (!id) return NextResponse.json({ error: 'Comment ID required' }, { status: 400, headers: noStore })
+    await setCommentApproval(id, body?.approved === true)
+    return NextResponse.json({ success: true }, { headers: noStore })
+  } catch (error) {
+    const failure = describeBlogAdminError(error)
+    return NextResponse.json(failure.body, { status: failure.status, headers: noStore })
   }
 }
 
-// Delete a comment
 export async function DELETE(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
-
+    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore })
+    let id = request.nextUrl.searchParams.get('id') || ''
     if (!id) {
-      return NextResponse.json({ error: 'Comment ID required' }, { status: 400 })
+      try {
+        const body = await request.json()
+        if (typeof body?.id === 'string') id = body.id
+      } catch {
+        id = ''
+      }
     }
-
-    const commentRef = doc(db, 'comments', id)
-    await deleteDoc(commentRef)
-
-    return NextResponse.json({ success: true })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!id) return NextResponse.json({ error: 'Comment ID required' }, { status: 400, headers: noStore })
+    await deleteComment(id)
+    return NextResponse.json({ success: true }, { headers: noStore })
+  } catch (error) {
+    const failure = describeBlogAdminError(error)
+    return NextResponse.json(failure.body, { status: failure.status, headers: noStore })
   }
 }

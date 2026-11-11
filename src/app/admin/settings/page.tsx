@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,10 +27,13 @@ export default function SettingsPage() {
 
   const loadSettings = async () => {
     try {
-      const settingsDoc = await getDoc(doc(db, 'settings', 'aiRules'))
-      if (settingsDoc.exists()) {
-        setGlobalRules(settingsDoc.data()?.rules || '')
+      const res = await fetch('/api/settings', { cache: 'no-store' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setSavedMessage(data.error || 'Could not load AI settings.')
+        return
       }
+      setGlobalRules(data.rules || '')
     } catch (error) {
       console.error('Error loading settings:', error)
     } finally {
@@ -43,10 +44,16 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      await setDoc(doc(db, 'settings', 'aiRules'), {
-        rules: globalRules,
-        updatedAt: new Date().toISOString(),
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rules: globalRules }),
       })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        alert(data.error || 'Error saving settings')
+        return
+      }
       setSavedMessage('✅ Settings saved! All future posts will use these rules.')
       setTimeout(() => setSavedMessage(''), 3000)
       setEditingRules(false)

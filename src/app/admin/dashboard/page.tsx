@@ -337,9 +337,11 @@ export default function AdminDashboard() {
                     {blogs.map((blog) => (
                       <tr key={blog.id} style={{ borderBottom: '1px solid #E5E7EB' }}>
                         <td style={{ padding: '16px', color: '#111827' }}>{blog.title}</td>
-                        <td style={{ padding: '16px', color: '#6B7280' }}>{blog.author}</td>
+                        <td style={{ padding: '16px', color: '#6B7280' }}>{blog.author || '—'}</td>
                         <td style={{ padding: '16px', color: '#6B7280' }}>
-                          {new Date(blog.createdAt).toLocaleDateString()}
+                          {typeof blog.createdAt === 'string' && !Number.isNaN(new Date(blog.createdAt).getTime())
+                            ? new Date(blog.createdAt).toLocaleDateString('en-NZ')
+                            : '—'}
                         </td>
                         <td style={{ padding: '16px' }}>
                           <span

@@ -4,6 +4,7 @@ import { AuthSessionProvider } from '@/components/SessionProvider'
 import PageTracker from '@/components/PageTracker'
 import { PLANS, SITE_DESCRIPTION } from '@/lib/pricing'
 import { resolveGaMeasurementId } from '@/lib/ga'
+import { SITE_LOGO_URL, SITE_NAME, SITE_OG_IMAGE_URL, SITE_URL } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'BUILDER BASE - Construction Management Software for NZ Builders',
@@ -12,9 +13,10 @@ export const metadata: Metadata = {
   authors: [{ name: 'BUILDER BASE' }],
   creator: 'BUILDER BASE',
   publisher: 'BUILDER BASE',
-  metadataBase: new URL('https://builderbase.co.nz'),
-  alternates: {
-    canonical: 'https://builderbase.co.nz',
+  metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   formatDetection: {
     email: false,
@@ -24,17 +26,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_NZ',
-    url: 'https://builderbase.co.nz',
-    siteName: 'BUILDER BASE',
+    siteName: SITE_NAME,
     title: 'BUILDER BASE - Construction Management Software for NZ Builders',
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: 'https://builderbase.co.nz/og-image.svg',
+        url: SITE_OG_IMAGE_URL,
         width: 1200,
         height: 630,
         alt: 'BUILDER BASE - Construction Management Software',
-        type: 'image/svg+xml',
+        type: 'image/png',
       },
     ],
   },
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'BUILDER BASE - Construction Management Software for NZ Builders',
     description: SITE_DESCRIPTION,
-    images: ['https://builderbase.co.nz/og-image.svg'],
+    images: [SITE_OG_IMAGE_URL],
     creator: '@builderbasehq',
   },
   robots: {
@@ -73,7 +74,7 @@ export default function RootLayout({
     name: 'BUILDER BASE',
     description: 'Construction management software for builders in New Zealand',
     applicationCategory: 'BusinessApplication',
-    url: 'https://builderbase.co.nz',
+    url: SITE_URL,
     operatingSystem: 'Web, iOS, Android',
     offers: PLANS.map((plan) => ({
       '@type': 'Offer',
@@ -97,9 +98,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#EAB308" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="canonical" href="https://builderbase.co.nz" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="sitemap" type="application/xml" href="https://builderbase.co.nz/sitemap.xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="sitemap" type="application/xml" href={`${SITE_URL}/sitemap.xml`} />
         
         {/* JSON-LD Schema Markup for better AI indexing */}
         <script
@@ -108,10 +109,10 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'BUILDER BASE',
-              url: 'https://builderbase.co.nz',
+              name: SITE_NAME,
+              url: SITE_URL,
               description: 'All-in-one construction management software for NZ builders',
-              logo: 'https://builderbase.co.nz/logo.png',
+              logo: SITE_LOGO_URL,
               sameAs: [
                 'https://www.facebook.com/profile.php?id=61585309743900',
                 'https://www.instagram.com/builderbasehq',
@@ -141,7 +142,7 @@ export default function RootLayout({
               '@type': 'LocalBusiness',
               name: 'BUILDER BASE',
               description: 'Construction management software for New Zealand builders',
-              url: 'https://builderbase.co.nz',
+              url: SITE_URL,
               areaServed: 'NZ',
               serviceType: 'Software Development, Construction Management',
             }),

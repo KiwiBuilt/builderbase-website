@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { ref, uploadBytes, listAll, getDownloadURL, deleteObject } from 'firebase/storage'
-import { storage } from '@/lib/firebase'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,17 +24,13 @@ export default function GalleryPage() {
 
   const loadImages = async () => {
     try {
-      const imagesRef = ref(storage, 'blog-images')
-      const result = await listAll(imagesRef)
-      const imageList = await Promise.all(
-        result.items.map(async (item) => ({
-          url: await getDownloadURL(item),
-          name: item.name,
-        }))
-      )
-      setImages(imageList.sort((a, b) => b.name.localeCompare(a.name)))
+      const res = await fetch('/api/gallery', { cache: 'no-store' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'Could not load gallery')
+      setImages(Array.isArray(data.images) ? data.images : [])
     } catch (error) {
       console.error('Error loading images:', error)
+      alert(error instanceof Error ? error.message : 'Error loading images')
     } finally {
       setLoading(false)
     }
@@ -49,26 +43,23 @@ export default function GalleryPage() {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i]
-        
-        // Validate file
         if (!file.type.startsWith('image/')) {
           alert(`${file.name} is not an image`)
           continue
         }
-        
         if (file.size > 10 * 1024 * 1024) {
           alert(`${file.name} is too large (max 10MB)`)
           continue
         }
-
-        const timestamp = Date.now()
-        const randomId = Math.random().toString(36).substring(7)
-        const fileName = `${timestamp}-${randomId}-${file.name}`
-        const imageRef = ref(storage, `blog-images/${fileName}`)
-        
-        await uploadBytes(imageRef, file)
-        const url = await getDownloadURL(imageRef)
-        setImages((prev) => [{ url, name: fileName }, ...prev])
+        const form = new FormData()
+        form.append('file', file)
+        const res = await fetch('/api/gallery', { method: 'POST', body: form })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok || !data.image) {
+          alert(data.error || `Could not upload ${file.name}`)
+          continue
+        }
+        setImages((prev) => [data.image, ...prev.filter((img: { name: string }) => img.name !== data.image.name)])
       }
     } catch (error) {
       console.error('Error uploading images:', error)
@@ -82,8 +73,12 @@ export default function GalleryPage() {
     if (!confirm(`Delete ${name}?`)) return
 
     try {
-      const imageRef = ref(storage, `blog-images/${name}`)
-      await deleteObject(imageRef)
+      const res = await fetch(`/api/gallery?name=${encodeURIComponent(name)}`, { method: 'DELETE' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        alert(data.error || 'Error deleting image')
+        return
+      }
       setImages((prev) => prev.filter((img) => img.name !== name))
       setSelectedImage(null)
     } catch (error) {

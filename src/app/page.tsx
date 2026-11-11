@@ -12,6 +12,12 @@ import { SITE_DESCRIPTION } from '@/lib/pricing'
 export const metadata: Metadata = {
   title: 'BUILDER BASE - Construction Management Software for NZ Builders',
   description: SITE_DESCRIPTION,
+  alternates: { canonical: 'https://www.builderbase.co.nz' },
+  openGraph: {
+    url: 'https://www.builderbase.co.nz',
+    title: 'BUILDER BASE - Construction Management Software for NZ Builders',
+    description: SITE_DESCRIPTION,
+  },
 }
 
 export default function Home() {
